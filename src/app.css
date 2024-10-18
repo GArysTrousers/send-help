@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+svg {
+  @apply outline-none;
+}
+
+.flex-col, .flex-row {
+  @apply flex;
+}
+
+.btn-icon {
+  @apply gap-1
+}
+
+body {
+  color: white;
+}
