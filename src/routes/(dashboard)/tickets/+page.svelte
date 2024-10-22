@@ -13,19 +13,23 @@
 		TableHeadCell
 	} from 'flowbite-svelte';
 	import { TableBodyRow } from 'flowbite-svelte';
-	import { faPlus } from '@fortawesome/free-solid-svg-icons';
+	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
 	import TicketEditor from '$lib/comp/TicketEditor.svelte';
+	import type { DbTicket } from '$lib/types/db';
+	import { ticketStatuses } from '$lib/stores';
 
-	let tickets: any[] = [];
-	let searchedTickets: any[] = [];
+	let tickets: DbTicket[] = [];
+	let searchedTickets: DbTicket[] = [];
 	let search = '';
 	let editor = {
 		open: false,
-		ticketId: ''
+		data: {
+			ticketId: 0
+		}
 	};
 	let creator = {
 		open: false,
@@ -35,23 +39,24 @@
 
 	$: {
 		let searchLow = search.toLowerCase();
-		searchedTickets =
-			search === ''
-				? tickets.slice(0, viewMax)
-				: tickets
-						.filter((v) => {
-							return (
-								v.user_id.toLowerCase().includes(searchLow) ||
-								v.dn.toLowerCase().includes(searchLow) ||
-								v.groups.toLowerCase().includes(searchLow)
-							);
-						})
-						.slice(0, viewMax);
+		searchedTickets = tickets
+			.filter((v) => {
+				if (search === '') return true;
+				return (
+					v.subject.toLowerCase().includes(searchLow) ||
+					v.message.toLowerCase().includes(searchLow) ||
+					v.owner.toLowerCase().includes(searchLow)
+				);
+			})
+			.filter((v) => {
+				return v.statusId !== 4;
+			})
+			.slice(0, viewMax);
 	}
 
 	onMount(async () => {
 		await getData();
-		const onLoadViewTicket = $page.url.searchParams.get('');
+		const onLoadViewTicket = Number($page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
 		}
@@ -61,10 +66,10 @@
 		tickets = await api('/api/ticket/get_all');
 	}
 
-	async function viewTicketDetails(id: string) {
-		editor.ticketId = id;
+	async function viewTicketDetails(id: number) {
+		editor.data.ticketId = id;
 		editor.open = true;
-		$page.url.searchParams.set('', editor.ticketId);
+		$page.url.searchParams.set('', String(editor.data.ticketId));
 		goto($page.url);
 	}
 </script>
@@ -77,9 +82,10 @@
 		<div class="flex-row"></div>
 	</div>
 	<div class="flex-row items-center justify-between gap-3">
-		<Search bind:value={search}></Search>
+		<Button color="none" class="px-1" on:click={() => {}}><Fa icon={faFilter} size="lg" /></Button>
+		<Search bind:value={search} size="md"></Search>
 		<Button
-			class="!p-3"
+			class="h-10 w-10"
 			on:click={() => {
 				creator.open = true;
 			}}><Fa icon={faPlus} size="lg" /></Button
@@ -87,19 +93,22 @@
 	</div>
 	<Table shadow hoverable={true}>
 		<TableHead>
-			<TableHeadCell>#</TableHeadCell>
+			<TableHeadCell class="hidden sm:table-cell">#</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
-			<TableHeadCell>Message</TableHeadCell>
+			<TableHeadCell class="hidden sm:table-cell">Message</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
 			{#if tickets.length > 0}
 				{#each searchedTickets as t}
-					<TableBodyRow class="cursor-pointer" on:click={() => viewTicketDetails(t.user_id)}>
-						<TableBodyCell>{t.ticketId}</TableBodyCell>
+					<TableBodyRow class="cursor-pointer" on:click={() => viewTicketDetails(t.ticketId)}>
+						<TableBodyCell class="hidden sm:table-cell">{t.ticketId}</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
-						<TableBodyCell>{t.message}</TableBodyCell>
-						<TableBodyCell>{t.statusId}</TableBodyCell>
+						<TableBodyCell class="hidden sm:table-cell">{t.message}</TableBodyCell>
+						<TableBodyCell
+							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
+								'Unknown'}</TableBodyCell
+						>
 					</TableBodyRow>
 				{/each}
 			{/if}
@@ -126,5 +135,10 @@
 		goto($page.url);
 	}}
 >
-<TicketEditor/>
+	<TicketEditor
+		bind:ticketId={editor.data.ticketId}
+		refresh={async () => {
+			getData();
+		}}
+	/>
 </Modal>

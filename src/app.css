@@ -14,6 +14,6 @@ svg {
   @apply gap-1
 }
 
-body {
-  color: white;
+body.dark {
+  @apply text-white bg-gray-900;
 }

@@ -5,6 +5,8 @@
 		SidebarGroup,
 		SidebarItem,
 		SidebarWrapper,
+    BottomNav,
+    BottomNavItem
 	} from 'flowbite-svelte';
 	import '../../app.css';
 	import Fa from 'svelte-fa';
@@ -22,12 +24,8 @@
 	$: activeUrl = $page.url.pathname;
 </script>
 
-<svelte:head>
-  <title>Techno</title>
-</svelte:head>
-
 <div class="flex-row gap-5 p-3">
-	<div class="flex-col">
+	<div class="hidden md:flex md:flex-col">
 		<Sidebar {activeUrl}>
 			<SidebarWrapper class="rounded-xl">
 				<SidebarGroup>
@@ -59,6 +57,23 @@
 	<div class="w-full">
 		<slot></slot>
 	</div>
+</div>
+
+<div class="flex-row md:hidden">
+  <BottomNav {activeUrl} position="absolute" classInner="grid-cols-4">
+    <BottomNavItem btnName="Home" href="/">
+      <Fa icon={faDashboard} />
+    </BottomNavItem>
+    <BottomNavItem btnName="Tickets" href="/tickets" exact={false}>
+      <Fa icon={faTicket} />
+    </BottomNavItem>
+    <BottomNavItem btnName="Users" href="/users">
+      <Fa icon={faUser} />
+    </BottomNavItem>
+    <BottomNavItem btnName="Settings" href="/settings">
+      <Fa icon={faCog} />
+    </BottomNavItem>
+  </BottomNav>
 </div>
 
 <style></style>
