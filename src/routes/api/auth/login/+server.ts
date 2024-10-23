@@ -15,8 +15,8 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     let body = schema.body.parse(await request.json());
 
     const user = await authenticate(body.username, body.password);
-    
-    if (user) {
+
+    if (user !== null) {
       locals.session.data = {
         user
       }
@@ -29,7 +29,6 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       throw error(400);
     }
     console.log(e);
-    
-    throw error(500)
+    throw e;
   }
 };

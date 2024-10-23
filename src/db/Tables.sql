@@ -10,6 +10,19 @@
 CREATE DATABASE IF NOT EXISTS `send-help` /*!40100 DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci */;
 USE `send-help`;
 
+CREATE TABLE IF NOT EXISTS `comment` (
+  `commentId` int(11) NOT NULL AUTO_INCREMENT,
+  `message` text NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `userId` varchar(50) NOT NULL,
+  `ticketId` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`commentId`),
+  KEY `FK__ticket` (`ticketId`),
+  KEY `FK_comment_user` (`userId`),
+  CONSTRAINT `FK__ticket` FOREIGN KEY (`ticketId`) REFERENCES `ticket` (`ticketId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_comment_user` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 CREATE TABLE IF NOT EXISTS `team` (
   `teamId` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '',
@@ -20,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `ticket` (
   `ticketId` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(127) NOT NULL DEFAULT '',
   `message` text NOT NULL DEFAULT '',
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
   `typeId` int(11) NOT NULL DEFAULT 0,
   `statusId` int(11) DEFAULT NULL,
   `teamId` int(11) NOT NULL,

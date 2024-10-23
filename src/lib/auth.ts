@@ -19,7 +19,7 @@ export async function authenticate(username: string, password: string): Promise<
       `SELECT * FROM user_team WHERE userId = :username`,
       { username }
     )
-    if (user) {
+    if (user !== null) {
       return {
         userId: user.userId,
         fn: user.fn,
