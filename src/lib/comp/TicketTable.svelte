@@ -97,7 +97,7 @@
 		</div>
 	{/if}
 
-	<Table shadow hoverable={true}>
+	<Table shadow hoverable={true} class="w-full">
 		<TableHead>
 			<TableHeadCell class="hidden sm:table-cell">#</TableHeadCell>
 			<TableHeadCell class="hidden sm:table-cell">Team</TableHeadCell>
@@ -109,12 +109,12 @@
 			{#if tickets.length > 0}
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
-						<TableBodyCell class="hidden sm:table-cell">{t.ticketId}</TableBodyCell>
-						<TableBodyCell class="hidden sm:table-cell">
+						<TableBodyCell class="hidden sm:table-cell">#{t.ticketId}</TableBodyCell>
+						<TableBodyCell class="hidden sm:table-cell max-w-0 truncate">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
-						<TableBodyCell class="hidden sm:table-cell">{t.message}</TableBodyCell>
+						<TableBodyCell class="hidden sm:table-cell max-w-0 truncate">{t.message}</TableBodyCell>
 						<TableBodyCell
 							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
 								'Unknown'}</TableBodyCell
