@@ -1,33 +1,17 @@
 import { error } from "@sveltejs/kit";
 import bcrypt from "bcryptjs";
 import { sql } from "./db";
-import type { AppSession } from "./types/auth";
+import type { AppSession, User } from "./types/session";
 
 
-export async function authMySql(username: string, password: string) {
-  try {
-    let user = await sql.getOne(
-      `SELECT * FROM user WHERE username = :username`,
-      { username }
-    )
-    if (user) {
-      if (!user.passhash || await bcrypt.compare(password, user.passhash)) {
-        return {
-          userId: user.userId,
-          username: user.username,
-          type: user.type,
-          permissions: user.permissions
-        }
-      }
-    }
-  } catch (e) { }
-  return null;
-}
-
-export async function authLdap(username: string, password: string) {
+export async function authLdap(username: string, password: string): Promise<User | null> {
   try {
     let user = await sql.getOne(
       `SELECT * FROM user WHERE userId = :username`,
+      { username }
+    )
+    let teams = await sql.get(
+      `SELECT * FROM user_team WHERE userId = :username`,
       { username }
     )
     if (user) {
@@ -36,6 +20,8 @@ export async function authLdap(username: string, password: string) {
           userId: user.userId,
           fn: user.fn,
           ln: user.ln,
+          permissions: user.permissions,
+          type: teams.length === 0 ? "client" : "admin"
         }
       }
     }

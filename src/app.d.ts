@@ -1,4 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
+
+import type { AppSession } from "$lib/types/session";
+
 // for information about these interfaces
 declare global {
 	namespace App {

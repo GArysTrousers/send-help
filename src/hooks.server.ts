@@ -1,8 +1,6 @@
 
 import type { Handle } from '@sveltejs/kit';
 import { InternalProvider, SessionManager } from "mega-session";
-import { sql } from "$lib/db";
-
 
 let sm = new SessionManager(
   new InternalProvider(), {

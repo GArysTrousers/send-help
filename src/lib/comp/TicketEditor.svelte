@@ -17,7 +17,8 @@
 	import { ticketStatuses } from '$lib/stores';
 
 	export let ticketId = 0;
-  export let refresh = async () => {}
+	export let mode: 'admin' | 'client' = 'admin';
+	export let refresh = async () => {};
 
 	let ticketDetails: TicketDetails | null = null;
 	let comments: DbComment[] = [];
@@ -59,7 +60,7 @@
 		try {
 			if (!ticketDetails) return;
 			await api('/api/ticket/set_status', { ticketId, statusId: ticketDetails.ticket.statusId });
-      refresh()
+			refresh();
 		} catch (e) {}
 	}
 </script>
@@ -87,21 +88,27 @@
 				<div class="flex-col gap-2">
 					<div class="flex-col">
 						<div class="text-sm">Status</div>
-						<Select
-							class="w-40"
-							items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
-							bind:value={ticketDetails.ticket.statusId}
-							on:change={updateTicketStatus}
-						/>
+						{#if mode === 'admin'}
+							<Select
+								class="w-40"
+								items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
+								bind:value={ticketDetails.ticket.statusId}
+								on:change={updateTicketStatus}
+							/>
+						{:else}
+							<div class="text-lg font-bold text-white">
+								{$ticketStatuses.find((v) => v.ticketStatusId === ticketDetails.ticket.statusId)?.name || 'Unknown'}
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>
 			<div class="flex-col">
 				<Heading tag="h4">History</Heading>
 				<Timeline>
-          <TimelineItem>
-            Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
-          </TimelineItem>
+					<TimelineItem>
+						Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
+					</TimelineItem>
 					{#each comments as c}
 						<TimelineItem date={dayjs(c.created).format('DD MMM YYYY - hh:mm')}>
 							<div class="flex-row gap-2 rounded-lg bg-gray-800 p-2 hover:brightness-110">
@@ -129,7 +136,7 @@
 
 <style>
 	:global(ol > li) {
-    margin-left: 0.6rem !important;
+		margin-left: 0.6rem !important;
 		margin-bottom: 0rem !important;
 	}
 </style>

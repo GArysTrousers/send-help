@@ -18,10 +18,9 @@
 	}
 </script>
 
-<main class="flex flex-row justify-center items-center mb-5">
+<main class="flex flex-row justify-center items-center mb-5 p-3">
 	<Card>
 		<div class="flex flex-col">
-			<Heading class="text-center mb-8">Super Rocketboard</Heading>
 			<div class="flex flex-col gap-2 text-center">
 				{#if result == 'waiting'}
 					<div>Logging out <Spinner></Spinner></div>

@@ -17,7 +17,7 @@
 	}
 </script>
 
-<main class="flex flex-row justify-center items-center mb-5">
+<main class="flex flex-row justify-center items-center mb-5 p-3">
 	<Card>
 		<div class="flex flex-col">
 			<Heading class="text-center mb-8">Send Help</Heading>
