@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { Input, Button, Textarea, Select } from 'flowbite-svelte';
+	import { teams, ticketTypes } from '$lib/stores';
 
 	let ticket = {
 		teamId: 1,
@@ -26,20 +27,14 @@
 		<div>Team</div>
 		<Select
 			bind:value={ticket.teamId}
-			items={[
-				{ name: 'Maintenance', value: 1 },
-				{ name: 'ICT', value: 2 }
-			]}
+			items={$teams.map((v) => ({ name: v.name, value: v.teamId }))}
 		/>
 	</div>
 	<div>
 		<div>Type</div>
 		<Select
 			bind:value={ticket.typeId}
-			items={[
-				{ name: 'Issue', value: 1 },
-				{ name: 'Task', value: 2 }
-			]}
+			items={$ticketTypes.map((v) => ({ name: v.name, value: v.ticketTypeId }))}
 		/>
 	</div>
 	<div>
