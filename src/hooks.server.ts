@@ -1,4 +1,5 @@
 
+import { SESSION_LENGTH } from '$env/static/private';
 import type { Handle } from '@sveltejs/kit';
 import { InternalProvider, SessionManager } from "mega-session";
 
@@ -6,7 +7,7 @@ let sm = new SessionManager(
   new InternalProvider(), {
   cookieName: "session_id",
   version: "1",
-  timeoutMillis: 1000000,
+  timeoutMillis: Number(SESSION_LENGTH),
 })
 await sm.init()
 
