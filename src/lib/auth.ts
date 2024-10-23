@@ -29,7 +29,9 @@ export async function authenticate(username: string, password: string): Promise<
         teams: teams.map((v) => (v.teamId))
       }
     }
-  } catch (e) { }
+  } catch (e) { 
+    console.log(e);
+  }
   return null;
 }
 
