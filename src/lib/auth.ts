@@ -1,11 +1,15 @@
 import { error } from "@sveltejs/kit";
 import bcrypt from "bcryptjs";
+import ldap from "ldapjs-promise";
 import { sql } from "./db";
 import type { AppSession, User } from "./types/session";
+import { LDAP_DOMAIN, LDAP_URL } from "$env/static/private";
 
 
-export async function authLdap(username: string, password: string): Promise<User | null> {
+export async function authenticate(username: string, password: string): Promise<User | null> {
   try {
+    if (!(await ldapAuth(username, password))) return null
+
     let user = await sql.getOne(
       `SELECT * FROM user WHERE userId = :username`,
       { username }
@@ -27,6 +31,21 @@ export async function authLdap(username: string, password: string): Promise<User
     }
   } catch (e) { }
   return null;
+}
+
+async function ldapAuth(username:string, password: string): Promise<boolean> {
+  let result = true;
+  const client = ldap.createClient({
+    url: [LDAP_URL]
+  })
+  try {
+    await client.bind(`${username}@${LDAP_DOMAIN}`, password)
+  } catch (e) {
+    console.log(e);
+    result = false;
+  }
+  client.destroy()
+  return result;
 }
 
 

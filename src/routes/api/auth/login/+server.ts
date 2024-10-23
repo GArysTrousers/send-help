@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { ZodError, z } from "zod";
-import { authLdap } from "$lib/auth";
+import { authenticate } from "$lib/auth";
 
 const schema = {
   body: z.object({
@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
   try {
     let body = schema.body.parse(await request.json());
 
-    const user = await authLdap(body.username, body.password);
+    const user = await authenticate(body.username, body.password);
     
     if (user) {
       locals.session.data = {

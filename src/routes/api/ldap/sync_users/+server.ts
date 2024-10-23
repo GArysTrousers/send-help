@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
 import ldap from "ldapjs-promise";
-import { LDAP_BASE, LDAP_PASSWORD, LDAP_USER_BASE, LDAP_URL, LDAP_USER } from "$env/static/private";
+import { LDAP_PASSWORD, LDAP_URL, LDAP_USER, LDAP_USER_BASES } from "$env/static/private";
 import type { RequestHandler } from "./$types";
 import { sql } from "$lib/db";
 
@@ -16,36 +16,42 @@ export const POST: RequestHandler = async () => {
     throw "Wrong password"
   }
 
+  const bases = LDAP_USER_BASES.split('|')
+  let numOfUsers = 0
+
   try {
-    let res = await client.searchReturnAll(
-      LDAP_USER_BASE,
-      {
-        filter: `(objectclass=user)`,
-        scope: 'sub',
-        attributes: ['sAMAccountName', 'userAccountControl', 'givenName', 'sn', 'memberOf', 'displayName', 'mail'],
-        paged: true,
+    for (const userBase of bases) {
+      let res = await client.searchReturnAll(
+        userBase,
+        {
+          filter: `(objectclass=user)`,
+          scope: 'sub',
+          attributes: ['sAMAccountName', 'userAccountControl', 'givenName', 'sn', 'memberOf', 'displayName', 'mail'],
+          paged: true,
+        }
+      );
+
+      for (const u of res.entries) {
+        let user = parseLdapUser(u)
+        await sql.set(`INSERT INTO user (userId, fn, ln)
+          VALUES (:userId, :fn, :ln)
+          ON DUPLICATE KEY UPDATE
+          fn = :fn, ln = :ln`, user)
+        numOfUsers += 1;
       }
-    );
-
-    client.destroy()
-    for (const u of res.entries) {
-      let user = parseLdapUser(u)
-      await sql.set(`INSERT INTO user (userId, fn, ln)
-        VALUES (:userId, :fn, :ln)
-        ON DUPLICATE KEY UPDATE
-        fn = :fn, ln = :ln`, user)
     }
-
-    return json({
-      numOfUsers: res.entries.length
-    })
   }
   catch (err) {
     client.destroy()
     throw err
   }
+  
+  client.destroy()
 
-};
+  return json({
+    numOfUsers: numOfUsers
+  })
+}
 
 function parseLdapUser(entry: ldap.SearchEntry) {
   let data = {}
