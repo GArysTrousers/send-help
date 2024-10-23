@@ -9,27 +9,37 @@
 		TableBodyCell,
 		TableHead,
 		TableHeadCell,
-    TableBodyRow
+		TableBodyRow,
+		Checkbox
 	} from 'flowbite-svelte';
 	import type { DbTicket } from '$lib/types/db';
 	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import { ticketStatuses } from '$lib/stores';
+	import { ticketStatuses, teams } from '$lib/stores';
 
-  
 	export let tickets: DbTicket[] = [];
 	export let viewMax = 15;
-  export let onTicketClicked = async (id: number) => {}
-  export let onNewClicked = () => {}
+	export let onTicketClicked = async (id: number) => {};
+	export let onNewClicked = () => {};
+	export let defaultTeams: number[] = [];
 
 	let searchedTickets: DbTicket[] = [];
-	let search = '';
+	const filter = {
+		show: false,
+		search: '',
+		teams: defaultTeams
+	};
 
-  $: {
-		let searchLow = search.toLowerCase();
+	const teamFilterState = {
+		1: true,
+		2: true
+	};
+
+	$: {
+		let searchLow = filter.search.toLowerCase();
 		searchedTickets = tickets
 			.filter((v) => {
-				if (search === '') return true;
+				if (searchLow === '') return true;
 				return (
 					v.subject.toLowerCase().includes(searchLow) ||
 					v.message.toLowerCase().includes(searchLow) ||
@@ -39,10 +49,21 @@
 			.filter((v) => {
 				return v.statusId !== 4;
 			})
+			.filter((v) => {
+				if (filter.teams.length === 0) return true;
+				return filter.teams.includes(v.teamId);
+			})
 			.slice(0, viewMax);
 	}
 
-
+	function toggleTeam(teamId: number, value: boolean) {
+		if (value === true) {
+			if (!filter.teams.includes(teamId)) filter.teams.push(teamId);
+			filter.teams = filter.teams;
+		} else {
+			filter.teams = filter.teams.filter((v) => v !== teamId);
+		}
+	}
 </script>
 
 <div class="flex-col gap-3">
@@ -53,16 +74,33 @@
 		<div class="flex-row"></div>
 	</div>
 	<div class="flex-row items-center justify-between gap-3">
-		<Button color="none" class="px-1" on:click={() => {}}><Fa icon={faFilter} size="lg" /></Button>
-		<Search bind:value={search} size="md"></Search>
 		<Button
-			class="h-10 w-10"
-			on:click={onNewClicked}><Fa icon={faPlus} size="lg" /></Button
+			color="none"
+			class="px-1"
+			on:click={() => {
+				filter.show = !filter.show;
+			}}><Fa icon={faFilter} size="lg" /></Button
 		>
+		<Search bind:value={filter.search} size="md"></Search>
+		<Button class="h-10 w-10" on:click={onNewClicked}><Fa icon={faPlus} size="lg" /></Button>
 	</div>
+
+	{#if filter.show}
+		<div class="flex flex-wrap gap-2">
+			{#each $teams as team}
+				<Checkbox
+					on:change={(e) => {
+						toggleTeam(team.teamId, e.target.checked);
+					}}>{team.name}</Checkbox
+				>
+			{/each}
+		</div>
+	{/if}
+
 	<Table shadow hoverable={true}>
 		<TableHead>
 			<TableHeadCell class="hidden sm:table-cell">#</TableHeadCell>
+			<TableHeadCell class="hidden sm:table-cell">Team</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell class="hidden sm:table-cell">Message</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
@@ -72,6 +110,9 @@
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
 						<TableBodyCell class="hidden sm:table-cell">{t.ticketId}</TableBodyCell>
+						<TableBodyCell class="hidden sm:table-cell">
+							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
+						</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
 						<TableBodyCell class="hidden sm:table-cell">{t.message}</TableBodyCell>
 						<TableBodyCell
@@ -86,5 +127,4 @@
 </div>
 
 <style>
-
 </style>

@@ -8,6 +8,9 @@
 	import TicketEditor from '$lib/comp/TicketEditor.svelte';
 	import type { DbTicket } from '$lib/types/db';
 	import TicketTable from '$lib/comp/TicketTable.svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 
 	let tickets: DbTicket[] = [];
 	let editor = {
@@ -42,12 +45,15 @@
 	}
 </script>
 
-<TicketTable
-	bind:tickets
-	onNewClicked={() => (creator.open = true)}
-	onTicketClicked={viewTicketDetails}
-	bind:viewMax
-/>
+<div class="w-full max-w-5xl">
+	<TicketTable
+		bind:tickets
+		onNewClicked={() => (creator.open = true)}
+		onTicketClicked={viewTicketDetails}
+		bind:viewMax
+		defaultTeams={data.user.teams}
+	/>
+</div>
 
 <Modal title="New Ticket" bind:open={creator.open}>
 	<TicketCreator

@@ -5,4 +5,7 @@ export const load: LayoutLoad = async ({ data }) => {
   teams.set(data.teams)
   ticketTypes.set(data.ticketTypes)
   ticketStatuses.set(data.ticketStatuses)
+  return {
+    user: data.session.data.user
+  }
 };
