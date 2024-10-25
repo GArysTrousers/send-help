@@ -27,7 +27,8 @@
 	const filter = {
 		show: false,
 		search: '',
-		teams: defaultTeams
+		teams: defaultTeams,
+    viewCompleted: false,
 	};
 
 	const teamFilterState = {
@@ -47,6 +48,7 @@
 				);
 			})
 			.filter((v) => {
+        if (filter.viewCompleted) return true;
 				return v.statusId !== 4;
 			})
 			.filter((v) => {
@@ -85,8 +87,9 @@
 		<Button class="h-10 w-10" on:click={onNewClicked}><Fa icon={faPlus} size="lg" /></Button>
 	</div>
 
-	{#if filter.show}
-		<div class="flex flex-wrap gap-2">
+	<div class="flex-wrap gap-3">
+    {#if filter.show}
+		<div class="flex-wrap gap-2 p-2 bg-gray-800 rounded-md">
 			{#each $teams as team}
 				<Checkbox
 					on:change={(e) => {
@@ -95,7 +98,11 @@
 				>
 			{/each}
 		</div>
+    <div class="flex-wrap gap-2 p-2 bg-gray-800 rounded-md">
+				<Checkbox bind:checked={filter.viewCompleted}>View Completed</Checkbox>
+		</div>
 	{/if}
+  </div>
 
 	<Table shadow hoverable={true} class="w-full">
 		<TableHead>

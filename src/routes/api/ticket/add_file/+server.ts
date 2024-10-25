@@ -79,12 +79,10 @@ export async function POST({ request, locals }) {
 
 
 function decode(dataURI: string) {
-  let start = Date.now();
   let mimeSearch = dataURI.match(/^data:([\w]+\/[-+\w\d]+);base64,/);
   if (mimeSearch === null || mimeSearch.length < 2) throw "nah she's fucked ay"
 
   const data = dataURI.substring(dataURI.indexOf(',') + 1)
-  console.log(data.substring(0, 50));
 
   return {
     mime: mimeSearch[1],

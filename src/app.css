@@ -6,7 +6,7 @@ svg {
   @apply outline-none;
 }
 
-.flex-col, .flex-row {
+.flex-col, .flex-row, .flex-wrap {
   @apply flex;
 }
 
