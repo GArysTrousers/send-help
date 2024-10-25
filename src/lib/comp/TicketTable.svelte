@@ -2,7 +2,6 @@
 	import {
 		Button,
 		Heading,
-		Modal,
 		Search,
 		Table,
 		TableBody,
@@ -16,7 +15,6 @@
 	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { ticketStatuses, teams } from '$lib/stores';
-	import { onMount } from 'svelte';
 
 	export let tickets: DbTicket[] = [];
 	export let viewMax = 30;
