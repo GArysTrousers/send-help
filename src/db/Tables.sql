@@ -15,12 +15,24 @@ CREATE TABLE IF NOT EXISTS `comment` (
   `message` text NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `userId` varchar(50) NOT NULL,
-  `ticketId` int(11) NOT NULL DEFAULT 0,
+  `ticketId` int(11) NOT NULL,
   PRIMARY KEY (`commentId`),
   KEY `FK__ticket` (`ticketId`),
   KEY `FK_comment_user` (`userId`),
   CONSTRAINT `FK__ticket` FOREIGN KEY (`ticketId`) REFERENCES `ticket` (`ticketId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_comment_user` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+CREATE TABLE IF NOT EXISTS `file` (
+  `fileId` int(11) NOT NULL AUTO_INCREMENT,
+  `commentId` int(11) DEFAULT NULL,
+  `mime` varchar(50) DEFAULT NULL,
+  `name` varchar(127) DEFAULT NULL,
+  `filename` varchar(255) DEFAULT NULL,
+  `thumb` varchar(127) DEFAULT NULL,
+  PRIMARY KEY (`fileId`),
+  KEY `FK_file_comment` (`commentId`),
+  CONSTRAINT `FK_file_comment` FOREIGN KEY (`commentId`) REFERENCES `comment` (`commentId`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE IF NOT EXISTS `team` (
