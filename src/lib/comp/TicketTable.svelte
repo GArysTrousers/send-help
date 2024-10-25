@@ -16,9 +16,10 @@
 	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { ticketStatuses, teams } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	export let tickets: DbTicket[] = [];
-	export let viewMax = 15;
+	export let viewMax = 30;
 	export let onTicketClicked = async (id: number) => {};
 	export let onNewClicked = () => {};
 	export let defaultTeams: number[] = [];
@@ -27,14 +28,18 @@
 	const filter = {
 		show: false,
 		search: '',
-		teams: defaultTeams,
+		teams: [0],
 		viewCompleted: false
 	};
 
-	const teamFilterState = {
-		1: true,
-		2: true
-	};
+	const teamState = $teams.map((v) => ({
+		id: v.teamId,
+		state: defaultTeams.includes(v.teamId)
+	}));
+
+	$: {
+		filter.teams = teamState.filter((v) => v.state).map((v) => v.id);
+	}
 
 	$: {
 		let searchLow = filter.search.toLowerCase();
@@ -56,15 +61,6 @@
 				return filter.teams.includes(v.teamId);
 			})
 			.slice(0, viewMax);
-	}
-
-	function toggleTeam(teamId: number, value: boolean) {
-		if (value === true) {
-			if (!filter.teams.includes(teamId)) filter.teams.push(teamId);
-			filter.teams = filter.teams;
-		} else {
-			filter.teams = filter.teams.filter((v) => v !== teamId);
-		}
 	}
 </script>
 
@@ -89,12 +85,8 @@
 	{#if filter.show}
 		<div class="flex-wrap gap-3">
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
-				{#each $teams as team}
-					<Checkbox
-						on:change={(e) => {
-							toggleTeam(team.teamId, e.target.checked);
-						}}>{team.name}</Checkbox
-					>
+				{#each $teams as team, i}
+					<Checkbox checked={teamState[i].state} on:change={(e) => teamState[i].state = e.target.checked}>{team.name}</Checkbox>
 				{/each}
 			</div>
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
