@@ -9,6 +9,14 @@ export interface DbComment {
   'ticketId': number;
   'userId': string;
 }
+export interface DbFile {
+  'commentId': number;
+  'fileId': number;
+  'filename': string | null;
+  'mime': string | null;
+  'name': string | null;
+  'thumb': string | null;
+}
 export interface DbTeam {
   'name': string;
   'teamId': number;

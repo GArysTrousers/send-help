@@ -9,24 +9,26 @@
 		Timeline,
 		TimelineItem,
 		Input,
-		Select
+		Select,
+		A
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
-	import type { DbComment } from '$lib/types/db';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { ticketStatuses } from '$lib/stores';
-	import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
+	import { faPaperclip, faFile } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
+	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
 
 	let fileSelector: HTMLInputElement;
+	let uploading = false;
 
 	export let ticketId = 0;
 	export let mode: 'admin' | 'client' = 'admin';
 	export let refresh = async () => {};
 
 	let ticketDetails: TicketDetails | null = null;
-	let comments: DbComment[] = [];
+	let comments: CommentWithFile[] = [];
 
 	let newCommentMessage = '';
 
@@ -69,12 +71,20 @@
 		} catch (e) {}
 	}
 
-  async function uploadFile() {
-    if (fileSelector.files && fileSelector.files.length > 0) {
-      const file = await loadFile(fileSelector.files[0])
-      await api('/api/ticket/add_file', file)
-    }
-  }
+	async function uploadFile() {
+		if (ticketDetails && fileSelector.files && fileSelector.files.length > 0) {
+			uploading = true;
+			try {
+				const file = await loadFile(fileSelector.files[0]);
+				await api('/api/ticket/add_file', {
+					...file,
+					ticketId: ticketDetails.ticket.ticketId
+				});
+			} catch (e) {}
+			getComments();
+			uploading = false;
+		}
+	}
 </script>
 
 <div>
@@ -141,9 +151,24 @@
 									/>
 									<div class="text-xs">{c.userId}</div>
 								</div>
-								<div class="w-full flex-col break-all">
-									{c.message}
-								</div>
+								{#if c.fileId === null}
+									<div class="w-full flex-col break-all">
+										{c.message}
+									</div>
+								{:else if c.mime === 'image/webp'}
+									<a href={`/content/file/${c.fileId}`} target="_blank">
+										<img src={`/content/image/${c.thumb}`} alt={c.name} />
+									</a>
+								{:else}
+									<A
+										class="flex-row items-center gap-3"
+										href={`/content/file/${c.fileId}`}
+										target="_blank"
+									>
+										<Fa icon={faFile} size="lg" />
+										<div class="">{c.name}</div>
+									</A>
+								{/if}
 							</div>
 						</TimelineItem>
 					{/each}
@@ -152,8 +177,17 @@
 			<div class="flex-row gap-2">
 				<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
 				<Input bind:value={newCommentMessage} placeholder="Add comment" />
-				<Button class="!p-2" color="none" on:click={() => fileSelector.click()}>
-					<Fa icon={faPaperclip} size="lg"/>
+				<Button
+					class="w-14 p-0"
+					color="none"
+					disabled={uploading}
+					on:click={() => fileSelector.click()}
+				>
+					{#if uploading}
+						<Spinner size="5" />
+					{:else}
+						<Fa icon={faPaperclip} size="lg" />
+					{/if}
 				</Button>
 				<Button on:click={addComment}>Send</Button>
 			</div>
