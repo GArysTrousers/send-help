@@ -28,7 +28,7 @@
 		show: false,
 		search: '',
 		teams: defaultTeams,
-    viewCompleted: false,
+		viewCompleted: false
 	};
 
 	const teamFilterState = {
@@ -48,7 +48,7 @@
 				);
 			})
 			.filter((v) => {
-        if (filter.viewCompleted) return true;
+				if (filter.viewCompleted) return true;
 				return v.statusId !== 4;
 			})
 			.filter((v) => {
@@ -73,7 +73,6 @@
 		<div class="flex-row">
 			<Heading tag="h3" class="px-2">Tickets</Heading>
 		</div>
-		<div class="flex-row"></div>
 	</div>
 	<div class="flex-row items-center justify-between gap-3">
 		<Button
@@ -87,22 +86,22 @@
 		<Button class="h-10 w-10" on:click={onNewClicked}><Fa icon={faPlus} size="lg" /></Button>
 	</div>
 
-	<div class="flex-wrap gap-3">
-    {#if filter.show}
-		<div class="flex-wrap gap-2 p-2 bg-gray-800 rounded-md">
-			{#each $teams as team}
-				<Checkbox
-					on:change={(e) => {
-						toggleTeam(team.teamId, e.target.checked);
-					}}>{team.name}</Checkbox
-				>
-			{/each}
-		</div>
-    <div class="flex-wrap gap-2 p-2 bg-gray-800 rounded-md">
+	{#if filter.show}
+		<div class="flex-wrap gap-3">
+			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
+				{#each $teams as team}
+					<Checkbox
+						on:change={(e) => {
+							toggleTeam(team.teamId, e.target.checked);
+						}}>{team.name}</Checkbox
+					>
+				{/each}
+			</div>
+			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
 				<Checkbox bind:checked={filter.viewCompleted}>View Completed</Checkbox>
+			</div>
 		</div>
 	{/if}
-  </div>
 
 	<Table shadow hoverable={true} class="w-full">
 		<TableHead>
@@ -117,11 +116,11 @@
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
 						<TableBodyCell class="hidden sm:table-cell">#{t.ticketId}</TableBodyCell>
-						<TableBodyCell class="hidden sm:table-cell max-w-0 truncate">
+						<TableBodyCell class="hidden max-w-0 truncate sm:table-cell">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
-						<TableBodyCell class="hidden sm:table-cell max-w-0 truncate">{t.message}</TableBodyCell>
+						<TableBodyCell class="hidden max-w-0 truncate sm:table-cell">{t.message}</TableBodyCell>
 						<TableBodyCell
 							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
 								'Unknown'}</TableBodyCell
