@@ -19,6 +19,7 @@
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
+	import { priorities, risks } from './info';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -63,10 +64,10 @@
 		} catch (e) {}
 	}
 
-	async function updateTicketStatus() {
+	async function updateTicket() {
 		try {
 			if (!ticketDetails) return;
-			await api('/api/ticket/set_status', { ticketId, statusId: ticketDetails.ticket.statusId });
+			await api('/api/ticket/update', { ticketId, ticket: ticketDetails.ticket });
 			refresh();
 		} catch (e) {}
 	}
@@ -98,7 +99,7 @@
 				<Heading tag="h4">{ticketDetails.ticket.subject}</Heading>
 			</div>
 			<div class="flex-col gap-2 md:flex-row">
-				<div class="flex-col gap-2">
+				<div class="flex-col gap-2 w-full">
 					<div class="w-full flex-row items-center gap-3">
 						<Avatar
 							size="md"
@@ -116,13 +117,30 @@
 
 				<div class="flex-col gap-2">
 					<div class="flex-col">
-						<div class="text-sm">Status</div>
 						{#if mode === 'admin'}
+						<div class="text-sm">Status</div>
 							<Select
 								class="w-40"
 								items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
 								bind:value={ticketDetails.ticket.statusId}
-								on:change={updateTicketStatus}
+								on:change={updateTicket}
+                size="sm"
+							/>
+              <div class="text-sm">Priority</div>
+              <Select
+								class="w-40"
+								items={priorities}
+								bind:value={ticketDetails.ticket.priority}
+								on:change={updateTicket}
+                size="sm"
+							/>
+              <div class="text-sm">Risk</div>
+              <Select
+								class="w-40"
+								items={risks}
+								bind:value={ticketDetails.ticket.risk}
+								on:change={updateTicket}
+                size="sm"
 							/>
 						{:else}
 							<div class="text-lg font-bold text-white">

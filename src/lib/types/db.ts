@@ -10,7 +10,7 @@ export interface DbComment {
   'userId': string;
 }
 export interface DbFile {
-  'commentId': number;
+  'commentId': number | null;
   'fileId': number;
   'filename': string | null;
   'mime': string | null;
@@ -25,6 +25,8 @@ export interface DbTicket {
   'created': Date;
   'message': string;
   'owner': string;
+  'priority': number;
+  'risk': number;
   'statusId': number | null;
   'subject': string;
   'teamId': number;

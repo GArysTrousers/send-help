@@ -55,7 +55,7 @@
 	/>
 </div>
 
-<Modal title="New Ticket" bind:open={creator.open}>
+<Modal bind:open={creator.open}>
 	<TicketCreator
 		onSubmit={() => {
 			creator.open = false;
