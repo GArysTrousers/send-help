@@ -44,6 +44,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fortawesome/free-regular-svg-icons": "^6.6.0",
 		"@fortawesome/free-solid-svg-icons": "^6.6.0",
 		"bcryptjs": "^2.4.3",
 		"dayjs": "^1.11.13",

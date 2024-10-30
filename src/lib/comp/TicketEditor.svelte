@@ -67,7 +67,12 @@
 	async function updateTicket() {
 		try {
 			if (!ticketDetails) return;
-			await api('/api/ticket/update', { ticketId, ticket: ticketDetails.ticket });
+			await api('/api/ticket/update', {
+				ticketId,
+				statusId: ticketDetails.ticket.statusId,
+        priority: ticketDetails.ticket.priority,
+        risk: ticketDetails.ticket.risk,
+			});
 			refresh();
 		} catch (e) {}
 	}
@@ -99,7 +104,7 @@
 				<Heading tag="h4">{ticketDetails.ticket.subject}</Heading>
 			</div>
 			<div class="flex-col gap-2 md:flex-row">
-				<div class="flex-col gap-2 w-full">
+				<div class="w-full flex-col gap-2">
 					<div class="w-full flex-row items-center gap-3">
 						<Avatar
 							size="md"
@@ -118,29 +123,29 @@
 				<div class="flex-col gap-2">
 					<div class="flex-col">
 						{#if mode === 'admin'}
-						<div class="text-sm">Status</div>
+							<div class="text-sm">Status</div>
 							<Select
 								class="w-40"
 								items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
 								bind:value={ticketDetails.ticket.statusId}
 								on:change={updateTicket}
-                size="sm"
+								size="sm"
 							/>
-              <div class="text-sm">Priority</div>
-              <Select
+							<div class="text-sm">Priority</div>
+							<Select
 								class="w-40"
 								items={priorities}
 								bind:value={ticketDetails.ticket.priority}
 								on:change={updateTicket}
-                size="sm"
+								size="sm"
 							/>
-              <div class="text-sm">Risk</div>
-              <Select
+							<div class="text-sm">Risk</div>
+							<Select
 								class="w-40"
 								items={risks}
 								bind:value={ticketDetails.ticket.risk}
 								on:change={updateTicket}
-                size="sm"
+								size="sm"
 							/>
 						{:else}
 							<div class="text-lg font-bold text-white">

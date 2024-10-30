@@ -12,9 +12,20 @@
 		Checkbox
 	} from 'flowbite-svelte';
 	import type { DbTicket } from '$lib/types/db';
-	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faPlus,
+		faFilter,
+		faTriangleExclamation,
+		faSkullCrossbones,
+		faCheck,
+		faArrowUp,
+		faArrowDown,
+		faMinus,
+    faGauge
+	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { ticketStatuses, teams } from '$lib/stores';
+	import { sortById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
 
 	export let tickets: DbTicket[] = [];
 	export let viewMax = 30;
@@ -22,6 +33,7 @@
 	export let onNewClicked = () => {};
 	export let defaultTeams: number[] = [];
 
+  let sorter: TicketSorter = sortById
 	let searchedTickets: DbTicket[] = [];
 	const filter = {
 		show: false,
@@ -29,6 +41,10 @@
 		teams: [0],
 		viewCompleted: false
 	};
+
+
+	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
+	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 
 	const teamState = $teams.map((v) => ({
 		id: v.teamId,
@@ -58,7 +74,8 @@
 				if (filter.teams.length === 0) return true;
 				return filter.teams.includes(v.teamId);
 			})
-			.slice(0, viewMax);
+			.slice(0, viewMax)
+      .sort(sorter);
 	}
 </script>
 
@@ -84,7 +101,10 @@
 		<div class="flex-wrap gap-3">
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
 				{#each $teams as team, i}
-					<Checkbox checked={teamState[i].state} on:change={(e) => teamState[i].state = e.target.checked}>{team.name}</Checkbox>
+					<Checkbox
+						checked={teamState[i].state}
+						on:change={(e) => (teamState[i].state = e.target.checked)}>{team.name}</Checkbox
+					>
 				{/each}
 			</div>
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
@@ -95,22 +115,38 @@
 
 	<Table shadow hoverable={true} class="w-full">
 		<TableHead>
-			<TableHeadCell class="hidden sm:table-cell">#</TableHeadCell>
+			<TableHeadCell class="hidden sm:table-cell">
+        <div class="grid grid-cols-3">
+          <button class="text-left" on:click={() => sorter = sortById}>#</button>
+          <button class="text-left" on:click={() => sorter = sortByPriority}><Fa icon={faGauge}/></button>
+          <button class="text-left" on:click={() => sorter = sortByRisk}><Fa icon={faSkullCrossbones}/></button>
+        </div>
+      </TableHeadCell>
 			<TableHeadCell class="hidden sm:table-cell">Team</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
-			<TableHeadCell class="hidden sm:table-cell">Message</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
 			{#if tickets.length > 0}
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
-						<TableBodyCell class="hidden sm:table-cell">#{t.ticketId}</TableBodyCell>
+						<TableBodyCell class="hidden sm:table-cell">
+							<div class="grid grid-cols-3">
+								<div>#{t.ticketId}</div>
+								<div>
+									<Fa icon={priorityIcons[t.priority - 1]} />
+								</div>
+								<div>
+									{#if t.risk > 1}
+										<Fa icon={riskIcons[t.risk - 1]} />
+									{/if}
+								</div>
+							</div>
+						</TableBodyCell>
 						<TableBodyCell class="hidden max-w-0 truncate sm:table-cell">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
-						<TableBodyCell class="hidden max-w-0 truncate sm:table-cell">{t.message}</TableBodyCell>
 						<TableBodyCell
 							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
 								'Unknown'}</TableBodyCell

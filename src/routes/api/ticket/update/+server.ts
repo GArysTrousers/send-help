@@ -7,6 +7,8 @@ const schema = {
   body: z.object({
     ticketId: z.number(),
     statusId: z.number(),
+    priority: z.number(),
+    risk: z.number(),
   })
 }
 
@@ -15,7 +17,10 @@ export async function POST({ request, locals }) {
   let body = schema.body.parse(await request.json());
   try {
     const ticket = await sql.set(`
-      UPDATE ticket SET statusId = :statusId
+      UPDATE ticket SET 
+      statusId = :statusId,
+      priority = :priority,
+      risk = :risk
       WHERE ticketId = :ticketId`, body)
 
     return json({})
