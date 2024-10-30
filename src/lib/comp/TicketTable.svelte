@@ -115,14 +115,14 @@
 
 	<Table shadow hoverable={true} class="w-full">
 		<TableHead>
-			<TableHeadCell class="hidden sm:table-cell">
-        <div class="grid grid-cols-3">
+			<TableHeadCell class="">
+        <div class="grid grid-cols-3 min-w-20 max-w-40">
           <button class="text-left" on:click={() => sorter = sortById}>#</button>
           <button class="text-left" on:click={() => sorter = sortByPriority}><Fa icon={faGauge}/></button>
           <button class="text-left" on:click={() => sorter = sortByRisk}><Fa icon={faSkullCrossbones}/></button>
         </div>
       </TableHeadCell>
-			<TableHeadCell class="hidden sm:table-cell">Team</TableHeadCell>
+			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
@@ -130,8 +130,8 @@
 			{#if tickets.length > 0}
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
-						<TableBodyCell class="hidden sm:table-cell">
-							<div class="grid grid-cols-3">
+						<TableBodyCell class="">
+							<div class="grid grid-cols-3 min-w-20 max-w-40">
 								<div>#{t.ticketId}</div>
 								<div>
 									<Fa icon={priorityIcons[t.priority - 1]} />
@@ -143,7 +143,7 @@
 								</div>
 							</div>
 						</TableBodyCell>
-						<TableBodyCell class="hidden max-w-0 truncate sm:table-cell">
+						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject}</TableBodyCell>
@@ -159,4 +159,7 @@
 </div>
 
 <style>
+  :global(td, th) {
+    @apply !px-2 md:!px-4;
+  }
 </style>
