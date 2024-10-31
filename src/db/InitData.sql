@@ -20,9 +20,12 @@ INSERT INTO `ticket_status` (`ticketStatusId`, `name`) VALUES
 INSERT INTO `ticket_type` (`ticketTypeId`, `name`) VALUES
 	(1, 'Issue'),
 	(2, 'Task');
-  
+
 INSERT INTO `user` (`userId`, `fn`, `ln`, `permissions`) VALUES
 	('admin', 'Mr', 'Manager', 0);
+
+INSERT INTO `user_team` (`userId`, `teamId`) VALUES
+	('admin', 2);
 
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
