@@ -146,7 +146,7 @@
 						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
-						<TableBodyCell>{t.subject}</TableBodyCell>
+						<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 						<TableBodyCell
 							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
 								'Unknown'}</TableBodyCell

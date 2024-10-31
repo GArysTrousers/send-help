@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS `ticket` (
   `ticketId` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(127) NOT NULL DEFAULT '',
   `message` text NOT NULL DEFAULT '',
+  `priority` int(11) NOT NULL DEFAULT 1,
+  `risk` int(11) NOT NULL DEFAULT 1,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `typeId` int(11) NOT NULL DEFAULT 0,
   `statusId` int(11) DEFAULT NULL,

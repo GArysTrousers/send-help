@@ -20,9 +20,15 @@ INSERT INTO `ticket_status` (`ticketStatusId`, `name`) VALUES
 INSERT INTO `ticket_type` (`ticketTypeId`, `name`) VALUES
 	(1, 'Issue'),
 	(2, 'Task');
+  
+INSERT INTO `user` (`userId`, `fn`, `ln`, `permissions`) VALUES
+	('admin', 'Mr', 'Manager', 0);
+
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+
