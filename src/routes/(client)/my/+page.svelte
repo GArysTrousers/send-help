@@ -42,12 +42,14 @@
 	}
 </script>
 
-<TicketTable
-	bind:tickets
-	onNewClicked={() => (creator.open = true)}
-	onTicketClicked={viewTicketDetails}
-	bind:viewMax
-/>
+<div class="w-full max-w-5xl">
+	<TicketTable
+		bind:tickets
+		onNewClicked={() => (creator.open = true)}
+		onTicketClicked={viewTicketDetails}
+		bind:viewMax
+	/>
+</div>
 
 <Modal title="New Ticket" bind:open={creator.open}>
 	<TicketCreator
