@@ -24,7 +24,7 @@
     faGauge
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import { ticketStatuses, teams } from '$lib/stores';
+	import { ticketStatuses, teams, user } from '$lib/stores';
 	import { sortById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
 
 	export let tickets: DbTicket[] = [];
@@ -72,6 +72,7 @@
 			})
 			.filter((v) => {
 				if (filter.teams.length === 0) return true;
+        if ($user && v.owner === $user.userId) return true;
 				return filter.teams.includes(v.teamId);
 			})
 			.slice(0, viewMax)

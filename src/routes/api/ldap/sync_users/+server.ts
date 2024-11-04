@@ -48,9 +48,7 @@ export const POST: RequestHandler = async () => {
   
   client.destroy()
 
-  return json({
-    numOfUsers: numOfUsers
-  })
+  return json(String(numOfUsers))
 }
 
 function parseLdapUser(entry: ldap.SearchEntry) {
