@@ -5,8 +5,8 @@ import { permission } from '$lib/auth.js';
 
 const schema = {
   body: z.object({
-    message: z.string(),
-    ticketId: z.number(),
+    userId: z.string(),
+    teamId: z.number(),
   })
 }
 
@@ -15,11 +15,9 @@ export async function POST({ request, locals }) {
   let body = schema.body.parse(await request.json());
   try {
     await sql.set(`
-      INSERT INTO comment (message, ticketId, userId) 
-      VALUES (:message, :ticketId, :userId)`, {
-        ...body,
-        userId: locals.session.data.user.userId
-      })
+      DELETE FROM user_team
+      WHERE userId = :userId
+      AND teamId = :teamId`, body)
   } catch (e) {
     console.log(e)
   }

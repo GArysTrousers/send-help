@@ -2,7 +2,7 @@
 	import { api } from '$lib/api';
 	import { user } from '$lib/stores';
 	import type { DbTeam, DbUser } from '$lib/types/db';
-	import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+	import { faUserPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 	import { Button, Heading, Card, Modal, Input } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
@@ -11,16 +11,16 @@
 		members: DbUser[];
 	}
 
-  interface UserSearch extends DbUser {
-    search: string;
-  }
+	interface UserSearch extends DbUser {
+		search: string;
+	}
 
 	let teams: Team[] = [];
 	let users: UserSearch[] = [];
 
 	let userPicker = {
 		open: false,
-    teamId: 0,
+		teamId: 0,
 		search: ''
 	};
 
@@ -31,10 +31,32 @@
 	async function getAll() {
 		try {
 			teams = await api('/api/team/get_all_with_members');
-			users = (await api<DbUser[]>('/api/user/get_all')).map((v)=> ({
-        ...v,
-        search: `${v.fn.toLowerCase()}|${v.ln.toLowerCase()}`
-      }));
+			users = (await api<DbUser[]>('/api/user/get_all')).map((v) => ({
+				...v,
+				search: `${v.fn.toLowerCase()}\t${v.ln.toLowerCase()}`
+			}));
+		} catch (e) {}
+	}
+
+	async function addUserToTeam(userId: string) {
+		try {
+			if (userPicker.teamId === 0) throw new Error('No team selected');
+			await api('/api/team/add_member', {
+				userId,
+				teamId: userPicker.teamId
+			});
+			getAll();
+			userPicker.open = false;
+		} catch (e) {}
+	}
+
+	async function removeUserFromTeam(userId: string, teamId: number) {
+		try {
+			await api('/api/team/remove_member', {
+				userId,
+				teamId
+			});
+			getAll();
 		} catch (e) {}
 	}
 </script>
@@ -52,32 +74,51 @@
 					class="!p-3"
 					on:click={() => {
 						userPicker.open = true;
-            userPicker.teamId = team.teamId;
+						userPicker.teamId = team.teamId;
 					}}><Fa icon={faUserPlus} /></Button
 				>
 			</div>
-			<div class="">
+			<div class="flex-col pt-1">
 				{#each team.members as member}
-					<div>{member.fn} {member.ln}</div>
+					<div class="team-user flex-row items-center justify-between">
+						<div>{member.fn} {member.ln}</div>
+						<div class="remove-user-button">
+							<Button
+								class="!p-2 text-sm"
+								color="light"
+								on:click={() => removeUserFromTeam(member.userId, team.teamId)}
+							>
+								<Fa icon={faMinus} />
+							</Button>
+						</div>
+					</div>
 				{/each}
 			</div>
 		</Card>
 	{/each}
 </div>
 
-<Modal bind:open={userPicker.open} title="Add User to Team">
+<Modal bind:open={userPicker.open} title="Add User to Team" size="xs">
 	<div class="flex-col gap-3">
 		<Input bind:value={userPicker.search} />
-		<div class="flex-col gap-2">
+		<div class="h-96 flex-col gap-2 overflow-auto">
 			{#each users.filter((v) => {
-        if (userPicker.search === '') return false;
-        return v.search.includes(userPicker.search)
-      }) as user}
-				<Button>{user.fn} {user.ln}</Button>
+				if (userPicker.search === '') return false;
+				return v.search.includes(userPicker.search);
+			}) as user}
+				<Button color="dark" on:click={() => addUserToTeam(user.userId)}>
+					<span class="w-full text-left">{user.fn} {user.ln}</span>
+				</Button>
 			{/each}
 		</div>
 	</div>
 </Modal>
 
 <style>
+	.remove-user-button {
+		@apply opacity-0 transition-opacity duration-200;
+	}
+	.team-user:hover .remove-user-button {
+		@apply !opacity-100;
+	}
 </style>
