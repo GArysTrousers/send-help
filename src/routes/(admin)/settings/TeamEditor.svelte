@@ -18,6 +18,11 @@
 	let teams: Team[] = [];
 	let users: UserSearch[] = [];
 
+  let creator = {
+		open: false,
+    name: ''
+	};
+
 	let userPicker = {
 		open: false,
 		teamId: 0,
@@ -38,17 +43,27 @@
 		} catch (e) {}
 	}
 
-	async function addUserToTeam(userId: string) {
-		try {
-			if (userPicker.teamId === 0) throw new Error('No team selected');
-			await api('/api/team/add_member', {
-				userId,
-				teamId: userPicker.teamId
-			});
-			getAll();
-			userPicker.open = false;
-		} catch (e) {}
-	}
+async function createTeam() {
+  try {
+    await api('/api/team/create', {
+      name: creator.name,
+    });
+    getAll();
+    creator.open = false;
+  } catch (e) {}
+}
+
+async function addUserToTeam(userId: string) {
+  try {
+    if (userPicker.teamId === 0) throw new Error('No team selected');
+    await api('/api/team/add_member', {
+      userId,
+      teamId: userPicker.teamId
+    });
+    getAll();
+    userPicker.open = false;
+  } catch (e) {}
+}
 
 	async function removeUserFromTeam(userId: string, teamId: number) {
 		try {
@@ -63,7 +78,10 @@
 
 <Heading tag="h3">Teams</Heading>
 <div class="flex-row justify-between">
-	<Button>New</Button>
+	<Button on:click={() => {
+    creator.name = '';
+    creator.open = true;
+  }}>New</Button>
 </div>
 <div class="flex-wrap gap-3">
 	{#each teams as team}
@@ -98,9 +116,16 @@
 	{/each}
 </div>
 
+<Modal bind:open={creator.open} title="Create New Team" size="xs">
+	<div class="flex-col gap-3">
+		<Input bind:value={creator.name} placeholder="Name"/>
+    <Button on:click={createTeam}>Create</Button>
+	</div>
+</Modal>
+
 <Modal bind:open={userPicker.open} title="Add User to Team" size="xs">
 	<div class="flex-col gap-3">
-		<Input bind:value={userPicker.search} />
+		<Input bind:value={userPicker.search} placeholder="Search..."/>
 		<div class="h-96 flex-col gap-2 overflow-auto">
 			{#each users.filter((v) => {
 				if (userPicker.search === '') return false;
