@@ -85,7 +85,7 @@ async function addUserToTeam(userId: string) {
 </div>
 <div class="flex-wrap gap-3">
 	{#each teams as team}
-		<Card>
+		<Card class="mb-auto">
 			<div class="flex-row justify-between">
 				<Heading tag="h4">{team.name}</Heading>
 				<Button
@@ -93,6 +93,7 @@ async function addUserToTeam(userId: string) {
 					on:click={() => {
 						userPicker.open = true;
 						userPicker.teamId = team.teamId;
+            userPicker.search = '';
 					}}><Fa icon={faUserPlus} /></Button
 				>
 			</div>
