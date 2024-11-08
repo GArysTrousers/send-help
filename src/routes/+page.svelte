@@ -5,7 +5,6 @@
 
 	export let data: PageData;
 	onMount(async () => {
-    console.log(data);
     if (data.session.data.user.type === "client") {
       goto('/my');
     } else if (data.session.data.user.type === "admin") {
