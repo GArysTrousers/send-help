@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import { user } from '$lib/stores';
 	import type { DbTeam, DbUser } from '$lib/types/db';
 	import { faUserPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 	import { Button, Heading, Card, Modal, Input } from 'flowbite-svelte';

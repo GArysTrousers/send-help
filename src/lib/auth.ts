@@ -1,5 +1,4 @@
 import { error } from "@sveltejs/kit";
-import bcrypt from "bcryptjs";
 import ldap from "ldapjs-promise";
 import { sql } from "./db";
 import type { AppSession, User } from "./types/session";
@@ -52,6 +51,9 @@ async function ldapAuth(username: string, password: string): Promise<boolean> {
 
 
 
-export function permission(session: AppSession) {
+export function permission(session: AppSession, allowed: string[] = []) {
+  console.log(session);
   if (!session || !session.data.user) throw error(401);
+  if (allowed.length > 0 && !allowed.includes(session.data.user.type)) 
+    throw error(403);
 }

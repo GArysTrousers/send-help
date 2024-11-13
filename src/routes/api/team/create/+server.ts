@@ -10,7 +10,7 @@ const schema = {
 }
 
 export async function POST({ request, locals }) {
-  permission(locals.session)
+  permission(locals.session, ['admin'])
   let body = schema.body.parse(await request.json());
   try {
     await sql.set(`

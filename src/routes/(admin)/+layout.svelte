@@ -13,7 +13,6 @@
 	import {
 		faDashboard,
 		faUser,
-		faLaptop,
 		faCog,
 		faTicket,
 		faDoorOpen
@@ -41,7 +40,7 @@
 			<SidebarWrapper class="rounded-xl">
 				<SidebarGroup>
 					<SidebarBrand {site} />
-					{#if (data.user.type === 'admin')}
+					{#if data.user.type === 'admin'}
 						<SidebarItem label="Dashboard" href="/dashboard" {activeClass}>
 							<svelte:fragment slot="icon">
 								<Fa icon={faDashboard} />
@@ -60,7 +59,7 @@
 						</svelte:fragment>
 					</SidebarItem>
 
-					{#if (data.user.type === 'admin')}
+					{#if data.user.type === 'admin'}
 						<SidebarItem label="Settings" href="/settings" {activeClass}>
 							<svelte:fragment slot="icon">
 								<Fa icon={faCog} />
@@ -83,19 +82,32 @@
 </div>
 
 <div class="flex-row md:hidden">
-	<BottomNav {activeUrl} position="absolute" classInner="grid-cols-4">
-		<BottomNavItem btnName="Home" href="/dashboard">
-			<Fa icon={faDashboard} />
-		</BottomNavItem>
-		<BottomNavItem btnName="Tickets" href="/tickets">
-			<Fa icon={faTicket} />
-		</BottomNavItem>
+	<BottomNav
+		{activeUrl}
+		position="absolute"
+		classInner={data.user.type === 'admin' ? 'grid-cols-4' : 'grid-cols-2'}
+	>
+		{#if data.user.type === 'admin'}
+			<!-- <BottomNavItem btnName="Home" href="/dashboard">
+				<Fa icon={faDashboard} />
+			</BottomNavItem> -->
+			<BottomNavItem btnName="Tickets" href="/tickets">
+				<Fa icon={faTicket} />
+			</BottomNavItem>
+			<BottomNavItem btnName="Mine" href="/my">
+				<Fa icon={faUser} />
+			</BottomNavItem>
+			<BottomNavItem btnName="Settings" href="/settings">
+				<Fa icon={faCog} />
+			</BottomNavItem>
+		{:else}
+			<BottomNavItem btnName="My Tickets" href="/my">
+				<Fa icon={faUser} />
+			</BottomNavItem>
+		{/if}
 		<!-- <BottomNavItem btnName="Users" href="/users">
       <Fa icon={faUser} />
     </BottomNavItem> -->
-		<BottomNavItem btnName="Settings" href="/settings">
-			<Fa icon={faCog} />
-		</BottomNavItem>
 		<BottomNavItem btnName="Logout" href="/logout">
 			<Fa icon={faDoorOpen} />
 		</BottomNavItem>

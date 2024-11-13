@@ -20,7 +20,6 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       locals.session.data = {
         user
       }
-      console.log(locals.session.data);
       return json({})
     }
     throw error(401, "Username or password incorrect")
