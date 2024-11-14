@@ -22,7 +22,6 @@ export const GET: RequestHandler = async ({ params, request, locals, url }) => {
   }
 
   try {
-    console.log(`${CONTENT_DIR}/portraits/${filename}`);
     let data = await readFile(`${CONTENT_DIR}/portraits/${filename}`)
     return new Response(data, {
       headers: {
