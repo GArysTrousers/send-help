@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params, request, locals, url }) => {
 
   if (file.filename && file.mime) {
     try {
-      let data = await readFile(`${CONTENT_DIR}/${file.filename}`)
+      let data = await readFile(`${CONTENT_DIR}/files/${file.filename}`)
       return new Response(data, {
         headers: {
           'Content-Type': file.mime

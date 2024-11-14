@@ -4,7 +4,6 @@
 		Avatar,
 		Button,
 		Heading,
-		Modal,
 		Spinner,
 		Timeline,
 		TimelineItem,
@@ -109,7 +108,7 @@
 						<Avatar
 							size="md"
 							class="aspect-square object-cover"
-							src="/content/portrait/ble.jpg"
+							src="/content/portrait/{ticketDetails.ticket.owner.toLowerCase()}.webp"
 							alt="portrait"
 						/>
 						<div class="italic">
@@ -169,7 +168,7 @@
 									<Avatar
 										size="md"
 										class="aspect-square object-cover"
-										src="/content/portrait/ble.jpg"
+										src="/content/portrait/ble.webp"
 										alt="portrait"
 									/>
 									<div class="text-xs">{c.userId}</div>
@@ -179,8 +178,8 @@
 										{c.message}
 									</div>
 								{:else if c.mime === 'image/webp'}
-									<a href={`/content/file/${c.fileId}`} target="_blank">
-										<img src={`/content/image/${c.thumb}`} alt={c.name} />
+									<a href={`/content/file/${c.filename}`} target="_blank">
+										<img src={`/content/image/${c.thumb}`} alt={c.name} class="max-h-60"/>
 									</a>
 								{:else}
 									<A

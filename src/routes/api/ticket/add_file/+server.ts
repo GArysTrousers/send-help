@@ -45,16 +45,16 @@ export async function POST({ request, locals }) {
       if (file.mime.match('image/.*')) {
         await sharp(file.buffer)
           .webp()
-          .toFile(`${CONTENT_DIR}/${fileInsert.insertId}.webp`);
+          .toFile(`${CONTENT_DIR}/files/${fileInsert.insertId}.webp`);
         await sharp(file.buffer)
           .resize(300, 300, { fit: 'outside' })
           .webp()
-          .toFile(`${CONTENT_DIR}/${fileInsert.insertId}-thumb.webp`);
+          .toFile(`${CONTENT_DIR}/files/${fileInsert.insertId}-thumb.webp`);
         newObj.mime = 'image/webp';
         newObj.filename = `${fileInsert.insertId}.webp`;
         newObj.thumb = `${fileInsert.insertId}-thumb.webp`;
       } else {
-        await writeFile(`${CONTENT_DIR}/${fileInsert.insertId}${ext}`, file.buffer)
+        await writeFile(`${CONTENT_DIR}/files/${fileInsert.insertId}${ext}`, file.buffer)
       }
     } catch (e) {
       console.log(e)

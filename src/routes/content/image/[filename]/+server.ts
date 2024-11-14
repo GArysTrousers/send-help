@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ params, request, locals, url }) => {
   }
 
   try {
-    let data = await readFile(`${CONTENT_DIR}/${filename}`)
+    let data = await readFile(`${CONTENT_DIR}/files/${filename}`)
     return new Response(data, {
       headers: {
         'Content-Type': 'image/*'
