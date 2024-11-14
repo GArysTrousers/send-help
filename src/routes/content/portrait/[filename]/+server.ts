@@ -1,4 +1,4 @@
-import { error, json, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { ZodError, z } from "zod";
 import type { RequestHandler } from './$types';
 import { readFile } from "node:fs/promises";

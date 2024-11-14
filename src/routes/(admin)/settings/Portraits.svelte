@@ -2,8 +2,8 @@
 	import { api } from '$lib/api';
 	import type { ImageUploadData } from '$lib/browser-files';
 	import ImageUploader from '$lib/comp/ImageUploader.svelte';
-	import { faUpload, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-	import { Button, Card, Heading, Modal, Spinner } from 'flowbite-svelte';
+	import { faUpload } from '@fortawesome/free-solid-svg-icons';
+	import { Button, Card, Heading, Modal } from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
 
 	let modalUpload = {
