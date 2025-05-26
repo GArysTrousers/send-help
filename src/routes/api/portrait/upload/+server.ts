@@ -1,6 +1,5 @@
 import { error, json } from '@sveltejs/kit';
 import { z } from "zod";
-import { sql } from "$lib/db";
 import { CONTENT_DIR } from '$env/static/private';
 import sharp from "sharp";
 import { parse } from "node:path";

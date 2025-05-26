@@ -8,8 +8,8 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 INSERT INTO `team` (`teamId`, `name`) VALUES
-	(1, 'Maintenance'),
-	(2, 'ICT');
+	(1, 'ICT'),
+	(2, 'Maintenance');
 
 INSERT INTO `ticket_status` (`ticketStatusId`, `name`) VALUES
 	(1, 'Open'),
@@ -19,7 +19,7 @@ INSERT INTO `ticket_status` (`ticketStatusId`, `name`) VALUES
 
 INSERT INTO `ticket_type` (`ticketTypeId`, `name`) VALUES
 	(1, 'Issue'),
-	(2, 'Task');
+	(2, 'Request');
 
 INSERT INTO `user` (`userId`, `fn`, `ln`, `permissions`) VALUES
 	('admin', 'Mr', 'Manager', 0);
