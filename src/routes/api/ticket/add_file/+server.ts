@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { z } from "zod";
 import { sql } from "$lib/db";
 import { CONTENT_DIR } from '$env/static/private';
@@ -15,54 +15,54 @@ const schema = {
   })
 }
 
-export async function POST({ request, locals }) {
+export const POST: RequestHandler = async ({ request, locals }) => {
   let body = schema.body.parse(await request.json());
   try {
     let file = decode(body.data)
     const ext = extname(body.name)
 
-    let commentInsert = await sql.set(`INSERT comment (message, userId, ticketId)
+    let commentInsert = sql.set(`INSERT comment (message, userId, ticketId)
       VALUES (:message, :userId, :ticketId)`, {
       message: '',
       userId: locals.session.data.user.userId,
       ticketId: body.ticketId,
     })
-    let fileInsert = await sql.set(`INSERT INTO file (commentId) VALUES (:commentId)`, {
-      commentId: commentInsert.insertId
+    let fileInsert = sql.set(`INSERT INTO file (commentId) VALUES (:commentId)`, {
+      commentId: commentInsert.lastInsertRowid
     });
 
-    if (fileInsert.affectedRows === 0) return error(500, "Couldn't record file")
+    if (fileInsert.changes === 0) return error(500, "Couldn't record file")
 
     let newObj: DbFile = {
       mime: file.mime,
       name: basename(body.name),
-      filename: `${fileInsert.insertId}${ext}`,
+      filename: `${fileInsert.lastInsertRowid}${ext}`,
       thumb: null,
-      commentId: commentInsert.insertId,
-      fileId: fileInsert.insertId,
+      commentId: Number(commentInsert.lastInsertRowid),
+      fileId: Number(fileInsert.lastInsertRowid),
     }
     try {
       if (file.mime.match('image/.*')) {
         await sharp(file.buffer)
           .webp()
-          .toFile(`${CONTENT_DIR}/files/${fileInsert.insertId}.webp`);
+          .toFile(`${CONTENT_DIR}/files/${fileInsert.lastInsertRowid}.webp`);
         await sharp(file.buffer)
           .resize(300, 300, { fit: 'outside' })
           .webp()
-          .toFile(`${CONTENT_DIR}/files/${fileInsert.insertId}-thumb.webp`);
+          .toFile(`${CONTENT_DIR}/files/${fileInsert.lastInsertRowid}-thumb.webp`);
         newObj.mime = 'image/webp';
-        newObj.filename = `${fileInsert.insertId}.webp`;
-        newObj.thumb = `${fileInsert.insertId}-thumb.webp`;
+        newObj.filename = `${fileInsert.lastInsertRowid}.webp`;
+        newObj.thumb = `${fileInsert.lastInsertRowid}-thumb.webp`;
       } else {
-        await writeFile(`${CONTENT_DIR}/files/${fileInsert.insertId}${ext}`, file.buffer)
+        await writeFile(`${CONTENT_DIR}/files/${fileInsert.lastInsertRowid}${ext}`, file.buffer)
       }
     } catch (e) {
       console.log(e)
-      await sql.set(`DELETE FROM file WHERE fileId = :id`, { id: fileInsert.insertId })
+      sql.set(`DELETE FROM file WHERE fileId = :id`, { id: fileInsert.lastInsertRowid })
       return error(500, "Failed to write to disk, removed record");
     }
 
-    await sql.set(`UPDATE file SET
+    sql.set(`UPDATE file SET
       mime = :mime,
       name = :name,
       filename = :filename,
@@ -74,7 +74,7 @@ export async function POST({ request, locals }) {
   } catch (e) {
     console.log(e);
   }
-
+  return error(500)
 };
 
 

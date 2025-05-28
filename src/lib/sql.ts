@@ -1,44 +1,31 @@
-import { createPool, type Pool, type QueryResult, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
+import { DatabaseSync } from "node:sqlite";
 
 export class Sql {
 
-  pool: Pool;
+  db: DatabaseSync;
 
-  constructor(config: {
-    host: string;
-    port: number;
-    user: string;
-    password: string;
-    database: string;
-  }) {
-    this.pool = createPool({
-      host: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      namedPlaceholders: true,
-    });
+  constructor(filename: string) {
+    this.db = new DatabaseSync(filename)
+    this.db.exec('PRAGMA foreign_keys = ON');
+    this.db.exec('PRAGMA journal_mode = WAL');
   }
 
-  async get<T = any>(query: string, data: Record<string, any> = {}) {
-    const res = await this.pool.execute<RowDataPacket[]>(query, data)
-    return res[0] as T[]
+  get<T = any>(query: string, data: Record<string, any> = {}) {
+    const rows = this.db.prepare(query).all(data)
+    return rows.map(row => ({ ...row }) as T);
   }
 
-  async getOne<T = any>(query: string, data: Record<string, any> = {}) {
-    const res = await this.pool.execute<RowDataPacket[]>(query, data)
-    if (res[0].length > 0)
-      return res[0][0] as T
-    else
-      return null
+  getOne<T = any>(query: string, data: Record<string, any> = {}) {
+    const row = this.db.prepare(query).get(data)
+    return row ? { ...row } as T : null;
   }
 
-  async set(query: string, data: any = {}) {
-    const res = await this.pool.execute<ResultSetHeader>(query, data)
-    return res[0]
+  set(query: string, data: any = {}) {
+    const res = this.db.prepare(query).run(data)
+    return res
+  }
+
+  run(query: string) {
+    this.db.exec(query)
   }
 }

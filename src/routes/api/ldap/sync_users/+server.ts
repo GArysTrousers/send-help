@@ -33,10 +33,10 @@ export const POST: RequestHandler = async () => {
 
       for (const u of res.entries) {
         let user = parseLdapUser(u)
-        await sql.set(`INSERT INTO user (userId, fn, ln)
-          VALUES (:userId, :fn, :ln)
-          ON DUPLICATE KEY UPDATE
-          fn = :fn, ln = :ln`, user)
+        sql.set(`INSERT INTO user (userId, fn, ln, src)
+          VALUES (:userId, :fn, :ln, :src)
+          ON CONFLICT (userId) DO UPDATE SET
+          fn = :fn, ln = :ln, src = :src`, user)
         numOfUsers += 1;
       }
     }
@@ -72,11 +72,12 @@ function parseLdapUser(entry: ldap.SearchEntry) {
     userId: String(data.sAMAccountName),
     fn: String(data.givenName),
     ln: String(data.sn),
+    src: 'ldap',
     // dn: String(data.displayName),
     // groups: data.groups.join(', '),
     // enabled: Number(!(data.userAccountControl & 0b10))
   }
-  // console.log(user);
+  console.log(user);
   return user;
 }
 
