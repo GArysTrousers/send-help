@@ -8,27 +8,27 @@ import type { DbUser, DbUserTeam } from "./types/db";
 
 export async function authenticate(username: string, password: string): Promise<User | null> {
   try {
-    if (!(await ldapAuth(username, password))) return null
-
-    let user = await sql.getOne<DbUser>(
+    username = username.toLowerCase()
+    let user = sql.getOne<DbUser>(
       `SELECT * FROM user WHERE userId = :username`,
       { username }
     )
-    let teams = await sql.get<DbUserTeam>(
+    if (user === null) return null;
+    if (await ldapAuth(username, password) === false) return null;
+    let teams = sql.get<DbUserTeam>(
       `SELECT * FROM user_team WHERE userId = :username`,
       { username }
     )
-    if (user !== null) {
-      return {
-        userId: user.userId,
-        fn: user.fn,
-        ln: user.ln,
-        permissions: user.permissions,
-        type: teams.length === 0 ? "client" : "admin",
-        teams: teams.map((v) => (v.teamId))
-      }
+
+    return {
+      userId: user.userId,
+      fn: user.fn,
+      ln: user.ln,
+      permissions: user.permissions,
+      type: teams.length === 0 ? "client" : "admin",
+      teams: teams.map((v) => (v.teamId))
     }
-  } catch (e) { 
+  } catch (e) {
     console.log(e);
   }
   return null;
@@ -53,6 +53,6 @@ async function ldapAuth(username: string, password: string): Promise<boolean> {
 
 export function permission(session: AppSession, allowed: string[] = []) {
   if (!session || !session.data.user) throw error(401);
-  if (allowed.length > 0 && !allowed.includes(session.data.user.type)) 
+  if (allowed.length > 0 && !allowed.includes(session.data.user.type))
     throw error(403);
 }

@@ -17,6 +17,10 @@ export interface DbFile {
   'name': string | null;
   'thumb': string | null;
 }
+export interface DbSession {
+  'data': string;
+  'id': string;
+}
 export interface DbTeam {
   'name': string;
   'teamId': number;
@@ -42,9 +46,11 @@ export interface DbTicketType {
   'ticketTypeId': number;
 }
 export interface DbUser {
+  'email': string;
   'fn': string;
   'ln': string;
   'permissions': number;
+  'src': string;
   'userId': string;
 }
 export interface DbUserTeam {

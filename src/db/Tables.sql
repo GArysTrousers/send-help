@@ -1,4 +1,10 @@
 CREATE TABLE
+  IF NOT EXISTS `session` (
+    `id` TEXT NOT NULL PRIMARY KEY,
+    `data` TEXT NOT NULL
+  );
+
+CREATE TABLE
   IF NOT EXISTS `comment` (
     `commentId` INTEGER NOT NULL PRIMARY KEY,
     `message` TEXT NOT NULL,
@@ -52,8 +58,9 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS `user` (
     `userId` TEXT NOT NULL PRIMARY KEY,
-    `fn` TEXT NOT NULL DEFAULT '',
-    `ln` TEXT NOT NULL DEFAULT '',
+    `fn` TEXT NOT NULL,
+    `ln` TEXT NOT NULL,
+    `email` TEXT NOT NULL,
     `permissions` INTEGER NOT NULL DEFAULT 0,
     `src` TEXT NOT NULL
   );

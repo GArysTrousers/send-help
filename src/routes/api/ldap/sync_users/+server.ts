@@ -1,18 +1,21 @@
 import { json } from "@sveltejs/kit";
-import ldap from "ldapjs-promise";
 import { LDAP_PASSWORD, LDAP_URL, LDAP_USER, LDAP_USER_BASES } from "$env/static/private";
 import type { RequestHandler } from "./$types";
 import { sql } from "$lib/db";
+import { Client, type Entry } from "ldapts";
 
 export const POST: RequestHandler = async () => {
 
-  const client = ldap.createClient({
-    url: [LDAP_URL]
-  })
+  const client = new Client({
+    url: LDAP_URL,
+  });
+  // const client = ldap.createClient({
+  //   url: [LDAP_URL]
+  // })
   try {
     await client.bind(LDAP_USER, LDAP_PASSWORD)
   } catch (err) {
-    client.destroy()
+    await client.unbind()
     throw "Wrong password"
   }
 
@@ -21,7 +24,7 @@ export const POST: RequestHandler = async () => {
 
   try {
     for (const userBase of bases) {
-      let res = await client.searchReturnAll(
+      let res = await client.search(
         userBase,
         {
           filter: `(objectclass=user)`,
@@ -31,53 +34,36 @@ export const POST: RequestHandler = async () => {
         }
       );
 
-      for (const u of res.entries) {
+      res.searchEntries
+
+      for (const u of res.searchEntries) {
         let user = parseLdapUser(u)
-        sql.set(`INSERT INTO user (userId, fn, ln, src)
-          VALUES (:userId, :fn, :ln, :src)
+        sql.set(`INSERT INTO user (userId, fn, ln, email, src)
+          VALUES (:userId, :fn, :ln, :email, :src)
           ON CONFLICT (userId) DO UPDATE SET
-          fn = :fn, ln = :ln, src = :src`, user)
+          fn = :fn, ln = :ln, email = :email, src = :src`, user)
         numOfUsers += 1;
       }
     }
   }
   catch (err) {
-    client.destroy()
+    client.unbind()
     throw err
   }
-  
-  client.destroy()
+
+  client.unbind()
 
   return json(String(numOfUsers))
 }
 
-function parseLdapUser(entry: ldap.SearchEntry) {
-  let data = {}
-  data.groups = []
-  for (const a of entry.attributes) {
-    if (a.type == "memberOf" && typeof a.values === 'object') {
-      // for (const group of a.values) {
-      //   if (groups.has(group)) {
-      //     data.groups.push(groups.get(group))
-      //   }
-      // }
-    }
-    else if (a.values.length == 1) {
-      data[a.type] = a.values[0]
-    }
-  }
-  // console.log(data);
-
+function parseLdapUser(entry: Entry) {
   let user = {
-    userId: String(data.sAMAccountName),
-    fn: String(data.givenName),
-    ln: String(data.sn),
+    userId: String(entry.sAMAccountName),
+    fn: String(entry.givenName),
+    ln: String(entry.sn),
+    email: String(entry.mail),
     src: 'ldap',
-    // dn: String(data.displayName),
-    // groups: data.groups.join(', '),
-    // enabled: Number(!(data.userAccountControl & 0b10))
   }
-  console.log(user);
   return user;
 }
 

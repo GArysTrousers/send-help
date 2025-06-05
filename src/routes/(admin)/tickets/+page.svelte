@@ -9,6 +9,7 @@
 	import type { DbTicket } from '$lib/types/db';
 	import TicketTable from '$lib/comp/TicketTable.svelte';
 	import type { PageData } from './$types';
+	import TicketAdminEditor from '$lib/comp/TicketAdminEditor.svelte';
 
 	export let data: PageData;
 
@@ -72,7 +73,7 @@
 		goto($page.url);
 	}}
 >
-	<TicketEditor
+	<TicketAdminEditor
 		bind:ticketId={editor.data.ticketId}
 		refresh={async () => {
 			getData();

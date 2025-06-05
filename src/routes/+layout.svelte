@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Send Help</title>
+  <title>Help Desk</title>
 </svelte:head>
 
 <slot></slot>

@@ -21,11 +21,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     let file = decode(body.data)
     const ext = extname(body.name)
 
-    let commentInsert = sql.set(`INSERT comment (message, userId, ticketId)
-      VALUES (:message, :userId, :ticketId)`, {
+    let commentInsert = sql.set(`INSERT INTO comment (message, userId, ticketId, created)
+      VALUES (:message, :userId, :ticketId, :created)`, {
       message: '',
       userId: locals.session.data.user.userId,
       ticketId: body.ticketId,
+      created: Date.now()
     })
     let fileInsert = sql.set(`INSERT INTO file (commentId) VALUES (:commentId)`, {
       commentId: commentInsert.lastInsertRowid
@@ -58,6 +59,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
     } catch (e) {
       console.log(e)
+      sql.set(`DELETE FROM comment WHERE commentId = :id`, { id: commentInsert.lastInsertRowid })
       sql.set(`DELETE FROM file WHERE fileId = :id`, { id: fileInsert.lastInsertRowid })
       return error(500, "Failed to write to disk, removed record");
     }
@@ -66,7 +68,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       mime = :mime,
       name = :name,
       filename = :filename,
-      thumb = :thumb
+      thumb = :thumb,
+      commentId = :commentId
       WHERE fileId = :fileId`, newObj);
 
     return json({});

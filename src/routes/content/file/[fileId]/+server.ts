@@ -15,7 +15,7 @@ const schema = {
 
 export const GET: RequestHandler = async ({ params, request, locals, url }) => {
   const { fileId } = params
-  const file = await sql.getOne<DbFile>('SELECT * FROM file WHERE fileId = :fileId', { fileId })
+  const file = sql.getOne<DbFile>('SELECT * FROM file WHERE fileId = :fileId', { fileId })
   if (file === null) throw error(404)
 
   if (file.filename && file.mime) {
