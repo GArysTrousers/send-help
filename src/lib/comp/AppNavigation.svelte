@@ -21,11 +21,12 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '$lib/types/session';
 
+  export let orgName: string;
 	export let activeUrl: string | undefined;
 	export let user: User;
 
 	let site = {
-		name: 'SendHelp',
+		name: orgName,
 		href: '/',
 		img: '/favicon.png'
 	};
