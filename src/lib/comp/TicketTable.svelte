@@ -114,7 +114,7 @@
 		</div>
 	{/if}
 
-	<Table shadow hoverable={true} class="w-full">
+	<Table shadow hoverable={searchedTickets.length > 0} class="w-full">
 		<TableHead>
 			<TableHeadCell class="">
         <div class="grid grid-cols-3 min-w-20 max-w-40">
@@ -128,7 +128,6 @@
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
-			{#if tickets.length > 0}
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
 						<TableBodyCell class="">
@@ -153,8 +152,17 @@
 								'Unknown'}</TableBodyCell
 						>
 					</TableBodyRow>
+          {:else}
+          <TableBodyRow>
+            <TableBodyCell colspan={6}>
+              <div class="flex-row justify-center">
+                <Button class="gap-1 text-lg" on:click={onNewClicked}>
+                  <Fa icon={faPlus}/> New Ticket
+                </Button>
+              </div>
+            </TableBodyCell>
+          </TableBodyRow>
 				{/each}
-			{/if}
 		</TableBody>
 	</Table>
 </div>

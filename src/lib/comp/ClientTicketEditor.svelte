@@ -8,17 +8,15 @@
 		Timeline,
 		TimelineItem,
 		Input,
-		Select,
 		A
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { ticketStatuses } from '$lib/stores';
-	import { faPaperclip, faFile, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+	import { faPaperclip, faFile } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
-	import { priorities, risks } from './info';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -28,7 +26,6 @@
 
 	let ticketDetails: TicketDetails | null = null;
 	let comments: CommentWithFile[] = [];
-	let changeOwnerUserPickerOpen = false;
 
 	let newCommentMessage = '';
 

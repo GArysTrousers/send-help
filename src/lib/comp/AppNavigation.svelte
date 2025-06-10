@@ -28,7 +28,7 @@
 	let site = {
 		name: orgName,
 		href: '/',
-		img: '/favicon.png'
+		img: '/favicon.svg'
 	};
 	let activeClass =
 		'flex items-center text-white p-2 rounded-lg bg-primary-600 hover:bg-primary-700';
