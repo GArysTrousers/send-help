@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { z } from "zod";
 import { CONTENT_DIR } from '$env/static/private';
 import sharp from "sharp";
@@ -11,7 +11,7 @@ const schema = {
   })
 }
 
-export async function POST({ url, request }) {
+export const POST: RequestHandler = async ({ request, url }) => {
   let body = schema.body.parse(await request.json());
   try {
     let filename = parse(body.name);
@@ -24,10 +24,10 @@ export async function POST({ url, request }) {
       return json({});
     } catch (e) {
       console.log(e)
-      return error(500, "Failed to write image to disk");
+      error(500, "Failed to write image to disk");
     }
   } catch (error) { console.log(error) }
-
+  error(500)
 };
 
 

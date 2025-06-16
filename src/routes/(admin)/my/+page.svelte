@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
-	import TicketEditor from '$lib/comp/TicketEditor.svelte';
+	import ClientTicketEditor from '$lib/comp/ClientTicketEditor.svelte';
 	import type { DbTicket } from '$lib/types/db';
 	import TicketTable from '$lib/comp/TicketTable.svelte';
 
@@ -68,9 +68,8 @@
 		goto($page.url);
 	}}
 >
-	<TicketEditor
+	<ClientTicketEditor
 		bind:ticketId={editor.data.ticketId}
-		mode="client"
 		refresh={async () => {
 			getData();
 		}}
