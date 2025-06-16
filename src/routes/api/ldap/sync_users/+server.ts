@@ -9,9 +9,6 @@ export const POST: RequestHandler = async () => {
   const client = new Client({
     url: LDAP_URL,
   });
-  // const client = ldap.createClient({
-  //   url: [LDAP_URL]
-  // })
   try {
     await client.bind(LDAP_USER, LDAP_PASSWORD)
   } catch (err) {

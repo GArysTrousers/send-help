@@ -51,8 +51,6 @@ async function ldapAuth(username: string, password: string): Promise<boolean> {
   return result;
 }
 
-
-
 export function permission(session: AppSession, allowed: string[] = []) {
   if (!session || !session.data.user) throw error(401);
   if (allowed.length > 0 && !allowed.includes(session.data.user.type))
