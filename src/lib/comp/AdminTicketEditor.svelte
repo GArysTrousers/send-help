@@ -27,7 +27,6 @@
 	let uploading = false;
 
 	export let ticketId = 0;
-	export let mode: 'admin' | 'client' = 'admin';
 	export let refresh = async () => {};
 
 	let ticketDetails: TicketDetails | null = null;

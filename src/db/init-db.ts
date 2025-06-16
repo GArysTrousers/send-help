@@ -4,10 +4,9 @@ import { readFileSync, rmSync, accessSync } from "node:fs";
 
 
 console.log("script: init db");
-console.log(readFileSync('./.env').toString());
 
 let env = new Map<string, string>();
-readFileSync('./.env').toString().split(/\r\n/).forEach((v) => {
+readFileSync('./.env').toString().split(/\r?\n/).forEach((v) => {
   let key = v.split('=', 1)[0]
   let value = v.slice(v.indexOf('=') + 1)
   env.set(key, value)

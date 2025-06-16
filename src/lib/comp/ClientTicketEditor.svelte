@@ -23,7 +23,7 @@
 	let uploading = false;
 
 	export let ticketId = 0;
-	export let refresh = async () => {};
+	// export let refresh = async () => {};
 
 	let ticketDetails: TicketDetails | null = null;
 	let comments: CommentWithFile[] = [];
