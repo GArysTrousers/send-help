@@ -1,7 +1,7 @@
 
 import { SESSION_LENGTH } from '$env/static/private';
 import { sql } from '$lib/db';
-import { sendEmail, testMailer } from '$lib/email';
+import { testMailer } from '$lib/email';
 import { NodeSqliteProvider } from '$lib/node-sqlite-provider';
 import type { Handle } from '@sveltejs/kit';
 import { SessionManager } from "mega-session";
