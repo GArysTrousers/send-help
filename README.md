@@ -13,7 +13,8 @@ LDAP_URL=ldap://10.1.1.1:389
 LDAP_USER=user@a.lan
 LDAP_PASSWORD="@ssword"
 LDAP_USER_BASES="OU=Staff,DC=a,DC=lan"
-CONTENT_DIR=/home/server/data
+CONTENT_DIR=/home/server/data/content
+DB_FILE=/home/server/data/db.sqlite
 SMTP_HOST=outlook.office365.com
 SMTP_PORT=587
 SMTP_USER=email@outlook.com
