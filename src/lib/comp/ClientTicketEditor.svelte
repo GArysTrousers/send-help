@@ -17,6 +17,7 @@
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
+	import TicketComment from './TicketComment.svelte';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -126,45 +127,8 @@
 					<TimelineItem>
 						Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
 					</TimelineItem>
-					{#each comments as c}
-						<TimelineItem>
-							<div
-								class="parent-hover-target flex-row gap-2 rounded-lg bg-gray-800 p-2 hover:brightness-110"
-							>
-								<div class="min-h-10 w-16 flex-col items-center">
-									<Avatar
-										size="md"
-										class="aspect-square object-cover"
-										src="/content/portrait/ble.webp"
-										alt="portrait"
-									/>
-									<div class="text-xs">{c.userId}</div>
-								</div>
-								<div class="flex-col w-full">
-									{#if c.fileId === null}
-										<div class="w-full flex-col break-all">
-											{c.message}
-										</div>
-									{:else if c.mime === 'image/webp'}
-										<a href={`/content/file/${c.fileId}`} target="_blank">
-											<img src={`/content/image/${c.thumb}`} alt={c.name} class="max-h-60" />
-										</a>
-									{:else}
-										<A
-											class="flex-row items-center gap-3"
-											href={`/content/file/${c.fileId}`}
-											target="_blank"
-										>
-											<Fa icon={faFile} size="lg" />
-											<div class="">{c.name}</div>
-										</A>
-									{/if}
-									<div class="show-on-parent-hover self-end whitespace-nowrap text-xs mt-auto">
-										{dayjs(c.created).format('DD MMM YYYY - hh:mm')}
-									</div>
-								</div>
-							</div>
-						</TimelineItem>
+					{#each comments as comment}
+						<TicketComment {comment}></TicketComment>
 					{/each}
 				</Timeline>
 			</div>
@@ -197,13 +161,5 @@
 	:global(ol > li) {
 		margin-left: 0.6rem !important;
 		margin-bottom: 0rem !important;
-	}
-
-	.parent-hover-target .show-on-parent-hover {
-		opacity: 0%;
-	}
-
-	.parent-hover-target:hover .show-on-parent-hover {
-		opacity: 100%;
 	}
 </style>

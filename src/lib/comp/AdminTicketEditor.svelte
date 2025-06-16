@@ -14,13 +14,14 @@
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { ticketStatuses } from '$lib/stores';
-	import { faPaperclip, faFile, faPen, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+	import { faPaperclip, faPen, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
 	import { priorities, risks } from './info';
 	import { faCommentDots } from '@fortawesome/free-regular-svg-icons';
 	import UserPicker from './UserPicker.svelte';
+	import TicketComment from './TicketComment.svelte';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -160,107 +161,71 @@
 								</Button>
 							</div>
 							<div class="flex-row gap-1">
-                <Button
-								title="Email Owner"
-								class="p-1 text-lg"
-								color="none"
-                href="mailto:{ticketDetails.user.email}?subject=Ticket: {ticketDetails.ticket.subject}"
-								><Fa icon={faEnvelope} /></Button
-							>
-              <Button
-								title="Start Teams Chat"
-								class="p-1 text-lg"
-								color="none"
-								on:click={() => {
-									if (ticketDetails) openTeamsChat(ticketDetails.user.email);
-								}}><Fa icon={faCommentDots} /></Button
-							>
-              </div>
+								<Button
+									title="Email Owner"
+									class="p-1 text-lg"
+									color="none"
+									href="mailto:{ticketDetails.user.email}?subject=Ticket: {ticketDetails.ticket
+										.subject}"><Fa icon={faEnvelope} /></Button
+								>
+								<Button
+									title="Start Teams Chat"
+									class="p-1 text-lg"
+									color="none"
+									on:click={() => {
+										if (ticketDetails) openTeamsChat(ticketDetails.user.email);
+									}}><Fa icon={faCommentDots} /></Button
+								>
+							</div>
 						</div>
 					</div>
 					<div>{ticketDetails.ticket.message}</div>
+					<div class="flex-col mt-5">
+						<Heading tag="h4">History</Heading>
+						<Timeline>
+							<TimelineItem>
+								Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
+							</TimelineItem>
+							{#each comments as comment}
+								<TicketComment {comment}></TicketComment>
+							{/each}
+						</Timeline>
+					</div>
 				</div>
 
 				<div class="flex-col gap-2">
 					<div class="flex-col">
-						{#if mode === 'admin'}
-							<div class="text-sm">Status</div>
-							<Select
-								class="w-40"
-								items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
-								bind:value={ticketDetails.ticket.statusId}
-								on:change={updateTicket}
-								size="sm"
-							/>
-							<div class="text-sm">Priority</div>
-							<Select
-								class="w-40"
-								items={priorities}
-								bind:value={ticketDetails.ticket.priority}
-								on:change={updateTicket}
-								size="sm"
-							/>
-							<div class="text-sm">Risk</div>
-							<Select
-								class="w-40"
-								items={risks}
-								bind:value={ticketDetails.ticket.risk}
-								on:change={updateTicket}
-								size="sm"
-							/>
-							<Button class="my-2 gap-1" on:click={sendUpdateNotification}
-								><Fa icon={faEnvelope} />Notify</Button
-							>
-						{:else}
-							<div class="text-lg font-bold text-white">
-								{$ticketStatuses.find((v) => v.ticketStatusId === ticketDetails?.ticket.statusId)
-									?.name || 'Unknown'}
-							</div>
-						{/if}
+						<div class="text-sm">Status</div>
+						<Select
+							class="w-40"
+							items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
+							bind:value={ticketDetails.ticket.statusId}
+							on:change={updateTicket}
+							size="sm"
+						/>
+						<div class="text-sm">Priority</div>
+						<Select
+							class="w-40"
+							items={priorities}
+							bind:value={ticketDetails.ticket.priority}
+							on:change={updateTicket}
+							size="sm"
+						/>
+						<div class="text-sm">Risk</div>
+						<Select
+							class="w-40"
+							items={risks}
+							bind:value={ticketDetails.ticket.risk}
+							on:change={updateTicket}
+							size="sm"
+						/>
+						<Button class="my-2 gap-1" on:click={sendUpdateNotification}
+							><Fa icon={faEnvelope} />Notify</Button
+						>
 					</div>
 				</div>
 			</div>
-			<div class="flex-col">
-				<Heading tag="h4">History</Heading>
-				<Timeline>
-					<TimelineItem>
-						Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
-					</TimelineItem>
-					{#each comments as c}
-						<TimelineItem date={dayjs(c.created).format('DD MMM YYYY - hh:mm')}>
-							<div class="flex-row gap-2 rounded-lg bg-gray-800 p-2 hover:brightness-110">
-								<div class="h-10 flex-col items-center">
-									<Avatar
-										size="md"
-										class="aspect-square object-cover"
-										src="/content/portrait/ble.webp"
-										alt="portrait"
-									/>
-									<div class="text-xs">{c.userId}</div>
-								</div>
-								{#if c.fileId === null}
-									<div class="w-full flex-col break-all">
-										{c.message}
-									</div>
-								{:else if c.mime === 'image/webp'}
-									<a href={`/content/file/${c.filename}`} target="_blank">
-										<img src={`/content/image/${c.thumb}`} alt={c.name} class="max-h-60" />
-									</a>
-								{:else}
-									<A
-										class="flex-row items-center gap-3"
-										href={`/content/file/${c.fileId}`}
-										target="_blank"
-									>
-										<Fa icon={faFile} size="lg" />
-										<div class="">{c.name}</div>
-									</A>
-								{/if}
-							</div>
-						</TimelineItem>
-					{/each}
-				</Timeline>
-			</div>
+
 			<div class="flex-row gap-2">
 				<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
 				<Input
