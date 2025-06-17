@@ -13,8 +13,8 @@ INSERT INTO `ticket_type` (`ticketTypeId`, `name`) VALUES
 	(1, 'Issue'),
 	(2, 'Request');
 
-INSERT INTO `user` (`userId`, `fn`, `ln`, `email`, `permissions`, `src`) VALUES
-	('admin', 'Mr', 'Manager', '', 0, 'local');
+INSERT INTO `user` (`userId`, `passhash`, `fn`, `ln`, `email`, `permissions`, `src`) VALUES
+	('admin', '', 'Mr', 'Manager', '', 0, 'local');
 
 INSERT INTO `user_team` (`userId`, `teamId`) VALUES
 	('admin', 1);

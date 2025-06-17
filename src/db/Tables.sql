@@ -58,6 +58,7 @@ CREATE TABLE
 CREATE TABLE
   IF NOT EXISTS `user` (
     `userId` TEXT NOT NULL PRIMARY KEY,
+    `passhash` TEXT DEFAULT NULL,
     `fn` TEXT NOT NULL,
     `ln` TEXT NOT NULL,
     `email` TEXT NOT NULL,

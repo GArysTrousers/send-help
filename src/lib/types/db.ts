@@ -49,6 +49,7 @@ export interface DbUser {
   'email': string;
   'fn': string;
   'ln': string;
+  'passhash': string | null;
   'permissions': number;
   'src': string;
   'userId': string;
