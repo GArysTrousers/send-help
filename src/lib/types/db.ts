@@ -43,6 +43,7 @@ export interface DbTicketStatus {
 }
 export interface DbTicketType {
   'name': string;
+  'teamId': number;
   'ticketTypeId': number;
 }
 export interface DbUser {

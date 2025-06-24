@@ -24,7 +24,7 @@
     faGauge
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import { ticketStatuses, teams, user } from '$lib/stores';
+	import { ticketStatuses, teams, user, ticketTypes } from '$lib/stores';
 	import { sortById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
 
 	export let tickets: DbTicket[] = [];
@@ -53,6 +53,7 @@
 
 	$: {
 		filter.teams = teamState.filter((v) => v.state).map((v) => v.id);
+    console.log(filter.teams);
 	}
 
 	$: {
@@ -72,7 +73,7 @@
 			})
 			.filter((v) => {
 				if (filter.teams.length === 0) return true;
-        if ($user && v.owner === $user.userId) return true;
+        if ($user && $user.userId === v.owner) return true;
 				return filter.teams.includes(v.teamId);
 			})
 			.slice(0, viewMax)
@@ -103,8 +104,8 @@
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
 				{#each $teams as team, i}
 					<Checkbox
-						checked={teamState[i].state}
-						on:change={(e) => (teamState[i].state = e.target.checked)}>{team.name}</Checkbox
+						bind:checked={teamState[i].state}
+						>{team.name}</Checkbox
 					>
 				{/each}
 			</div>
@@ -116,22 +117,23 @@
 
 	<Table shadow hoverable={searchedTickets.length > 0} class="w-full">
 		<TableHead>
-			<TableHeadCell class="">
-        <div class="grid grid-cols-3 min-w-20 max-w-40">
+			<TableHeadCell class="max-w-0">
+        <div class="grid grid-cols-3 min-w-24 max-w-40">
           <button class="text-left" on:click={() => sorter = sortById}>#</button>
           <button class="text-left" on:click={() => sorter = sortByPriority}><Fa icon={faGauge}/></button>
           <button class="text-left" on:click={() => sorter = sortByRisk}><Fa icon={faSkullCrossbones}/></button>
         </div>
       </TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
+			<TableHeadCell>Type</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
-						<TableBodyCell class="">
-							<div class="grid grid-cols-3 min-w-20 max-w-40">
+						<TableBodyCell class="max-w-0">
+							<div class="grid grid-cols-3 min-w-24 max-w-40">
 								<div>#{t.ticketId}</div>
 								<div>
 									<Fa icon={priorityIcons[t.priority - 1]} />
@@ -145,6 +147,9 @@
 						</TableBodyCell>
 						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
 							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
+						</TableBodyCell>
+            <TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
+							{$ticketTypes.find((v) => v.ticketTypeId === t.typeId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 						<TableBodyCell

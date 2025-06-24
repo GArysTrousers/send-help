@@ -13,6 +13,10 @@
     risk: 1,
 	};
 
+  $: availableTypes = $ticketTypes
+  .filter((v) => (v.teamId === ticket.teamId))
+  .map((v) => ({ name: v.name, value: v.ticketTypeId }))
+
   export let onSubmit = () => {}
 
   async function create() {
@@ -23,6 +27,10 @@
       
     }
   }
+
+  function onTeamChanged() {
+    ticket.typeId = availableTypes[0].value
+  }
 </script>
 
 <div class="grid grid-cols-2 gap-1">
@@ -31,13 +39,14 @@
 		<Select
 			bind:value={ticket.teamId}
 			items={$teams.map((v) => ({ name: v.name, value: v.teamId }))}
+      on:change={onTeamChanged}
 		/>
 	</div>
 	<div class="col-span-2 sm:col-span-1">
 		<div>Type</div>
 		<Select
 			bind:value={ticket.typeId}
-			items={$ticketTypes.map((v) => ({ name: v.name, value: v.ticketTypeId }))}
+			items={availableTypes}
 		/>
 	</div>
   <div class="col-span-2 my-3">

@@ -9,9 +9,12 @@ INSERT INTO `ticket_status` (`ticketStatusId`, `name`) VALUES
 	(3, 'On Hold'),
 	(4, 'Completed');
 
-INSERT INTO `ticket_type` (`ticketTypeId`, `name`) VALUES
-	(1, 'Issue'),
-	(2, 'Request');
+INSERT INTO `ticket_type` (`ticketTypeId`, `name`, `teamId`) VALUES
+	(1, 'Issue', 1),
+	(2, 'Request', 1),
+  (3, 'Buildings', 2),
+	(4, 'Grounds', 2),
+	(5, 'Health and Safety', 2);
 
 INSERT INTO `user` (`userId`, `passhash`, `fn`, `ln`, `email`, `permissions`, `src`) VALUES
 	('admin', '', 'Mr', 'Manager', '', 0, 'local');
