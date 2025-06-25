@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import type { ImageUploadData } from '$lib/browser-files';
-	import ImageUploader from '$lib/comp/ImageUploader.svelte';
-	import { user } from '$lib/stores';
-	import { faKey, faUpload } from '@fortawesome/free-solid-svg-icons';
+	import { stores } from '$lib/stores.svelte';
+	import { faKey } from '@fortawesome/free-solid-svg-icons';
 	import { Button, Card, Heading, Input, Modal } from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
 
@@ -33,9 +31,9 @@
 <Card>
 	<Heading tag="h3">User</Heading>
 	<div class="flex-col gap-3 pt-3">
-		<div class="text-lg font-bold">{$user?.fn} {$user?.ln} ({$user?.userId})</div>
+		<div class="text-lg font-bold">{stores.user?.fn} {stores.user?.ln} ({stores.user?.userId})</div>
 		<div class="flex-row gap-2">
-			{#if $user?.src === 'local'}
+			{#if stores.user?.src === 'local'}
 				<Button class="btn-icon" on:click={openUploader}><Fa icon={faKey} />Change Password</Button>
 			{/if}
 		</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Heading, Card, Spinner, A } from 'flowbite-svelte';
+	import { Card, Spinner, A } from 'flowbite-svelte';
 	import { api } from '$lib/api';
 	import { onMount } from 'svelte';
 

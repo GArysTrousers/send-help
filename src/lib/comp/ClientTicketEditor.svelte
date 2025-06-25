@@ -12,7 +12,7 @@
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
-	import { ticketStatuses } from '$lib/stores';
+	import { stores } from '$lib/stores.svelte';
 	import { faPaperclip, faFile } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
@@ -114,7 +114,7 @@
 				<div class="flex-col gap-2">
 					<div class="flex-col">
 						<div class="text-lg font-bold text-white">
-							{$ticketStatuses.find((v) => v.ticketStatusId === ticketDetails?.ticket.statusId)
+							{stores.ticketStatuses.find((v) => v.ticketStatusId === ticketDetails?.ticket.statusId)
 								?.name || 'Unknown'}
 						</div>
 					</div>

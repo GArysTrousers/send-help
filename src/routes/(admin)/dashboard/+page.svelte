@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Card, Heading } from 'flowbite-svelte';
+	import { Card, Heading } from 'flowbite-svelte';
 	import type { PageData } from './$types';
 	import Fa from 'svelte-fa';
 	import { faTicket,faCircle } from '@fortawesome/free-solid-svg-icons';

@@ -12,7 +12,7 @@
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
-	import { ticketStatuses } from '$lib/stores';
+	import { stores } from '$lib/stores.svelte';
 	import { faPaperclip, faPen, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
@@ -196,7 +196,7 @@
 						<div class="text-sm">Status</div>
 						<Select
 							class="w-40"
-							items={$ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
+							items={stores.ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
 							bind:value={ticketDetails.ticket.statusId}
 							on:change={updateTicket}
 							size="sm"

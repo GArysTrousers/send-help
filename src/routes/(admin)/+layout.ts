@@ -1,11 +1,12 @@
-import { teams, ticketStatuses, ticketTypes, user } from '$lib/stores';
+
+import { stores } from '$lib/stores.svelte';
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ data }) => {
-  teams.set(data.teams)
-  ticketTypes.set(data.ticketTypes)
-  ticketStatuses.set(data.ticketStatuses)
-  user.set(data.session.data.user)
+  stores.user = data.session.data.user
+  stores.teams = data.teams;
+  stores.ticketTypes = data.ticketTypes
+  stores.ticketStatuses = data.ticketStatuses
   return {
     orgName: data.orgName,
     user: data.session.data.user

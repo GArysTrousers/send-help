@@ -4,7 +4,7 @@ import type { DbTicket } from '$lib/types/db';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const tickets = await sql.get<DbTicket>(`SELECT * FROM ticket WHERE statusId < 4`)
+  const tickets = sql.get<DbTicket>(`SELECT * FROM ticket WHERE statusId < 4`)
   return { 
     tickets,
   }

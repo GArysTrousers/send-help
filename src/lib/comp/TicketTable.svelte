@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		Button,
-		Heading,
 		Search,
 		Table,
 		TableBody,
@@ -24,7 +23,7 @@
     faGauge
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import { ticketStatuses, teams, user, ticketTypes } from '$lib/stores';
+	import { stores } from '$lib/stores.svelte';
 	import { sortById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
 
 	export let tickets: DbTicket[] = [];
@@ -46,7 +45,7 @@
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 
-	const teamState = $teams.map((v) => ({
+	const teamState = stores.teams.map((v) => ({
 		id: v.teamId,
 		state: defaultTeams.includes(v.teamId)
 	}));
@@ -72,7 +71,7 @@
 			})
 			.filter((v) => {
 				if (filter.teams.length === 0) return true;
-        if ($user && $user.userId === v.owner) return true;
+        if (stores.user && stores.user.userId === v.owner) return true;
 				return filter.teams.includes(v.teamId);
 			})
 			.slice(0, viewMax)
@@ -96,7 +95,7 @@
 	{#if filter.show}
 		<div class="flex-wrap gap-3">
 			<div class="flex-wrap gap-2 rounded-md bg-gray-800 p-2">
-				{#each $teams as team, i}
+				{#each stores.teams as team, i}
 					<Checkbox
 						bind:checked={teamState[i].state}
 						>{team.name}</Checkbox
@@ -140,14 +139,14 @@
 							</div>
 						</TableBodyCell>
 						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
-							{$teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
+							{stores.teams.find((v) => v.teamId === t.teamId)?.name || 'Unknown'}
 						</TableBodyCell>
             <TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
-							{$ticketTypes.find((v) => v.ticketTypeId === t.typeId)?.name || 'Unknown'}
+							{stores.ticketTypes.find((v) => v.ticketTypeId === t.typeId)?.name || 'Unknown'}
 						</TableBodyCell>
 						<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 						<TableBodyCell
-							>{$ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
+							>{stores.ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name ||
 								'Unknown'}</TableBodyCell
 						>
 					</TableBodyRow>

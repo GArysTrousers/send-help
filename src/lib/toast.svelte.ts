@@ -6,7 +6,6 @@ export interface Toast {
   body: string;
 }
 
-
 export const toasts: Toast[] = $state([])
 
 export function addToast(type: 'success' | 'error' | 'info', body: string) {

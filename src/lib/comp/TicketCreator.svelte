@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { Input, Button, Textarea, Select, Range, Hr } from 'flowbite-svelte';
-	import { teams, ticketTypes } from '$lib/stores';
+	import { stores } from '$lib/stores.svelte';
 	import { priorities, risks } from './info';
 
 	let ticket = {
@@ -13,7 +13,7 @@
 		risk: 1
 	};
 
-	$: availableTypes = $ticketTypes
+	$: availableTypes = stores.ticketTypes
 		.filter((v) => v.teamId === ticket.teamId)
 		.map((v) => ({ name: v.name, value: v.ticketTypeId }));
 
@@ -36,7 +36,7 @@
 		<div>Team</div>
 		<Select
 			bind:value={ticket.teamId}
-			items={$teams.map((v) => ({ name: v.name, value: v.teamId }))}
+			items={stores.teams.map((v) => ({ name: v.name, value: v.teamId }))}
 			on:change={onTeamChanged}
 		/>
 	</div>
