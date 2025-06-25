@@ -53,7 +53,6 @@
 
 	$: {
 		filter.teams = teamState.filter((v) => v.state).map((v) => v.id);
-    console.log(filter.teams);
 	}
 
 	$: {
@@ -82,11 +81,6 @@
 </script>
 
 <div class="flex-col gap-3">
-	<div class="flex-row items-center justify-between rounded-xl bg-gray-800 p-2">
-		<div class="flex-row">
-			<Heading tag="h3" class="px-2">Tickets</Heading>
-		</div>
-	</div>
 	<div class="flex-row items-center justify-between gap-3">
 		<Button
 			color="none"
@@ -117,7 +111,7 @@
 
 	<Table shadow hoverable={searchedTickets.length > 0} class="w-full">
 		<TableHead>
-			<TableHeadCell class="max-w-0">
+			<TableHeadCell class="max-w-40">
         <div class="grid grid-cols-3 min-w-24 max-w-40">
           <button class="text-left" on:click={() => sorter = sortById}>#</button>
           <button class="text-left" on:click={() => sorter = sortByPriority}><Fa icon={faGauge}/></button>
@@ -125,14 +119,14 @@
         </div>
       </TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
-			<TableHeadCell>Type</TableHeadCell>
+			<TableHeadCell class="hidden lg:table-cell">Type</TableHeadCell>
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
 				{#each searchedTickets as t}
 					<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(t.ticketId)}>
-						<TableBodyCell class="max-w-0">
+						<TableBodyCell class="max-w-40">
 							<div class="grid grid-cols-3 min-w-24 max-w-40">
 								<div>#{t.ticketId}</div>
 								<div>

@@ -5,10 +5,6 @@
 		SidebarGroup,
 		SidebarItem,
 		SidebarWrapper,
-		BottomNav,
-		BottomNavItem,
-		Drawer,
-		Button
 	} from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
 	import {
@@ -17,7 +13,6 @@
 		faCog,
 		faTicket,
 		faDoorOpen,
-		faBars
 	} from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '$lib/types/session';
 

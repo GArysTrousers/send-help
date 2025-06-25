@@ -40,7 +40,7 @@
 <Drawer bind:hidden={mobileNav.hidden} transitionParams={mobileNav.transition}>
 	<AppNavigation orgName={data.orgName} activeUrl={activeUrl} user={data.user}></AppNavigation>
 </Drawer>
-<div class="flex-row gap-5 p-3">
+<div class="flex-row gap-5 p-1 sm:p-3">
 	<div class="hidden md:flex md:flex-col">
 		<AppNavigation orgName={data.orgName} activeUrl={activeUrl} user={data.user}></AppNavigation>
 	</div>
