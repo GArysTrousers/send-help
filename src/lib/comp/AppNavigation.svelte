@@ -13,6 +13,7 @@
 		faCog,
 		faTicket,
 		faDoorOpen,
+		faUsers,
 	} from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '$lib/types/session';
 
@@ -49,6 +50,12 @@
 			<SidebarItem label="My Tickets" href="/my" {activeClass}>
 				<svelte:fragment slot="icon">
 					<Fa icon={faUser} />
+				</svelte:fragment>
+			</SidebarItem>
+
+      <SidebarItem label="Users" href="/users" {activeClass}>
+				<svelte:fragment slot="icon">
+					<Fa icon={faUsers} />
 				</svelte:fragment>
 			</SidebarItem>
 

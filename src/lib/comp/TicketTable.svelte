@@ -24,7 +24,7 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
-	import { sortById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
+	import { sortTicketById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
 
 	export let tickets: DbTicket[] = [];
 	export let viewMax = 30;
@@ -32,7 +32,7 @@
 	export let onNewClicked = () => {};
 	export let defaultTeams: number[] = [];
 
-  let sorter: TicketSorter = sortById
+  let sorter: TicketSorter = sortTicketById
 	let searchedTickets: DbTicket[] = [];
 	const filter = {
 		show: false,
@@ -112,7 +112,7 @@
 		<TableHead>
 			<TableHeadCell class="max-w-40">
         <div class="grid grid-cols-3 min-w-24 max-w-40">
-          <button class="text-left" on:click={() => sorter = sortById}>#</button>
+          <button class="text-left" on:click={() => sorter = sortTicketById}>#</button>
           <button class="text-left" on:click={() => sorter = sortByPriority}><Fa icon={faGauge}/></button>
           <button class="text-left" on:click={() => sorter = sortByRisk}><Fa icon={faSkullCrossbones}/></button>
         </div>

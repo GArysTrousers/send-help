@@ -7,23 +7,23 @@
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
 	import type { DbTicket } from '$lib/types/db';
 	import TicketTable from '$lib/comp/TicketTable.svelte';
-	import type { PageData } from './$types';
 	import AdminTicketEditor from '$lib/comp/AdminTicketEditor.svelte';
 
-	export let data: PageData;
+	let { data } = $props();
+	console.log(data);
 
-	let tickets: DbTicket[] = [];
-	let editor = {
+	let tickets: DbTicket[] = $state([]);
+	let editor = $state({
 		open: false,
 		data: {
 			ticketId: 0
 		}
-	};
-	let creator = {
+	});
+	let creator = $state({
 		open: false,
 		data: {}
-	};
-	let viewMax = 15;
+	});
+	let viewMax = $state(15);
 
 	onMount(async () => {
 		await getData();
