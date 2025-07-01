@@ -3,8 +3,10 @@
 	import { Heading, Input, Card, Button } from 'flowbite-svelte';
 	import { api } from '$lib/api';
 	import type { PageData } from './$types';
+	import Fa from 'svelte-fa';
+	import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-  export let data:PageData
+	export let data: PageData;
 
 	let username = '';
 	let password = '';
@@ -20,20 +22,34 @@
 	}
 </script>
 
-<main class="flex flex-row justify-center items-center mb-5 p-3">
+<main class="mb-5 flex flex-row items-center justify-center p-3">
 	<Card>
-		<div class="flex flex-col py-3">
-			<h2 class="text-center mb-2 text-2xl text-gray-400 font-bold">{data.orgName || "Send Help"}</h2>
-      <Heading class="text-center mb-8">{data.loginTitle || "Help Desk"}</Heading>
-			<div class="flex flex-col gap-2 px-7 pt-3">
-				<Input bind:value={username} on:keypress={submitIfEnter} placeholder="Username" />
-				<Input
-					bind:value={password}
-					on:keypress={submitIfEnter}
-					placeholder="Password"
-					type="password"
-				/>
-				<Button class="mt-3" on:click={login}>Login</Button>
+		<div class="flex flex-col py-8">
+			<h2 class="mb-2 text-center text-2xl font-bold text-gray-400">
+				{data.orgName || 'Send Help'}
+			</h2>
+			<Heading class="mb-10 text-center">{data.loginTitle || 'Help Desk'}</Heading>
+			<div class="flex flex-col gap-2 px-5 pt-3">
+				<div class="min-w-2xs flex flex-col gap-3">
+					<Input
+						class="rounded-full px-5"
+						bind:value={username}
+						onkeypress={submitIfEnter}
+						placeholder="Username"
+					/>
+					<div class="flex flex-row">
+						<Input
+							class="rounded-l-full px-5"
+							bind:value={password}
+							onkeypress={submitIfEnter}
+							placeholder="Password"
+							type="password"
+						/>
+						<Button class="rounded-r-full pl-2 pr-3 text-xl" onclick={login}
+							><Fa icon={faArrowRight} /></Button
+						>
+					</div>
+				</div>
 			</div>
 		</div>
 	</Card>
