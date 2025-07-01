@@ -4,7 +4,7 @@
 		SidebarBrand,
 		SidebarGroup,
 		SidebarItem,
-		SidebarWrapper,
+		SidebarWrapper
 	} from 'flowbite-svelte';
 	import Fa from 'svelte-fa';
 	import {
@@ -13,11 +13,11 @@
 		faCog,
 		faTicket,
 		faDoorOpen,
-		faUsers,
+		faUsers
 	} from '@fortawesome/free-solid-svg-icons';
 	import type { User } from '$lib/types/session';
 
-  export let orgName: string;
+	export let orgName: string;
 	export let activeUrl: string | undefined;
 	export let user: User;
 
@@ -53,13 +53,12 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-      <SidebarItem label="Users" href="/users" {activeClass}>
-				<svelte:fragment slot="icon">
-					<Fa icon={faUsers} />
-				</svelte:fragment>
-			</SidebarItem>
-
 			{#if user.type === 'admin'}
+				<SidebarItem label="Users" href="/users" {activeClass}>
+					<svelte:fragment slot="icon">
+						<Fa icon={faUsers} />
+					</svelte:fragment>
+				</SidebarItem>
 				<SidebarItem label="Settings" href="/settings" {activeClass}>
 					<svelte:fragment slot="icon">
 						<Fa icon={faCog} />

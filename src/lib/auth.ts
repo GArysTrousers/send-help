@@ -53,7 +53,7 @@ async function ldapAuth(username: string, password: string): Promise<boolean> {
   try {
     await client.bind(`${username}@${LDAP_DOMAIN}`, password);
   } catch (e) {
-    // console.log(e);
+    console.log(e);
     result = false;
   }
   client.unbind()

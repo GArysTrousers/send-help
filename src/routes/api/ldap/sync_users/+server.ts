@@ -55,7 +55,7 @@ export const POST: RequestHandler = async () => {
 
 function parseLdapUser(entry: Entry) {
   let user = {
-    userId: String(entry.sAMAccountName),
+    userId: String(entry.sAMAccountName).toLowerCase(),
     fn: String(entry.givenName),
     ln: String(entry.sn),
     email: String(entry.mail),
