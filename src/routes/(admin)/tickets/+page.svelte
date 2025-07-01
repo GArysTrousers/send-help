@@ -10,7 +10,6 @@
 	import AdminTicketEditor from '$lib/comp/AdminTicketEditor.svelte';
 
 	let { data } = $props();
-	console.log(data);
 
 	let tickets: DbTicket[] = $state([]);
 	let editor = $state({
