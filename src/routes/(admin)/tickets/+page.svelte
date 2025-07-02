@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { Heading, Modal } from 'flowbite-svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -15,22 +15,28 @@
 	let editor = $state({
 		open: false,
 		data: {
-			ticketId: 0
-		}
+			ticketId: 0,
+		},
 	});
 	let creator = $state({
 		open: false,
-		data: {}
+		data: {},
 	});
 	let viewMax = $state(15);
+	let refreshTimer: number;
 
 	onMount(async () => {
 		await getData();
+		refreshTimer = window.setInterval(() => getData(), 30000);
 		const onLoadViewTicket = Number($page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
 		}
 	});
+
+  onDestroy(() => {
+    window.clearInterval(refreshTimer)
+  })
 
 	async function getData() {
 		tickets = await api('/api/ticket/get_all');

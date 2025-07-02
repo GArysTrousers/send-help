@@ -43,7 +43,7 @@
 
 	let sorter: TicketSorter = $state(sortTicketById);
 	const filter = $state({
-		show: true,
+		show: false,
 		search: '',
 		teams: defaultTeams,
 		viewCompleted: false,
@@ -52,7 +52,7 @@
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
-  const ticketStatusColors = ['', 'text-green-500', 'text-blue-500', 'text-orange-500', 'text-gray-500']
+	const ticketStatusColors = ['', 'text-green-500', 'text-blue-500', 'text-orange-500', 'text-gray-500'];
 
 	function filterTickets(tickets: DbTicket[], filter: any, sorter: TicketSorter) {
 		let searchLow = filter.search.toLowerCase();
@@ -154,7 +154,7 @@
 					</TableBodyCell>
 					<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 					<TableBodyCell>
-						<div class="flex-row gap-1 items-center">
+						<div class="flex-row items-center gap-1">
 							<Fa icon={faCircle} class={ticketStatusColors[t.statusId]} />
 							{stores.ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name || 'Unknown'}
 						</div>
@@ -176,7 +176,4 @@
 </div>
 
 <style>
-	:global(td, th) {
-		@apply !px-2 md:!px-4;
-	}
 </style>

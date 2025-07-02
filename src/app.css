@@ -17,3 +17,7 @@ svg {
 body.dark {
   @apply text-white bg-gray-900;
 }
+
+td, th {
+  @apply !px-2 md:!px-4;
+}
