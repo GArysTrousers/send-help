@@ -53,6 +53,7 @@
 		onNewClicked={() => (creator.open = true)}
 		onTicketClicked={viewTicketDetails}
 		bind:viewMax
+    defaultTeams={[]}
 	/>
 </div>
 
