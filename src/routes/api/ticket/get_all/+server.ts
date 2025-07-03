@@ -1,14 +1,12 @@
-import { json } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
-import { sql } from "$lib/db";
-import { permission } from "$lib/auth";
-
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { sql } from '$lib/db';
+import { permission } from '$lib/auth';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  permission(locals.session, ['admin'])
+	permission(locals.session, ['admin']);
 
-  let res = await sql.get(`
-  SELECT * FROM ticket`)
+	let res = sql.get(`SELECT * FROM ticket`);
 
-  return json(res)
+	return json(res);
 };

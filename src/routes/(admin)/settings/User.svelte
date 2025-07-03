@@ -8,7 +8,7 @@
 	let modalChangePassword = {
 		open: false,
 		old: '',
-		new: ''
+		new: '',
 	};
 
 	function openUploader() {
@@ -21,9 +21,9 @@
 		try {
 			await api('/api/auth/change_password', {
 				oldPassword: modalChangePassword.old,
-				newPassword: modalChangePassword.new
+				newPassword: modalChangePassword.new,
 			});
-      modalChangePassword.open = false;
+			modalChangePassword.open = false;
 		} catch (e) {}
 	}
 </script>

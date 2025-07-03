@@ -1,20 +1,19 @@
-import type { DbTicket, DbUser } from "$lib/types/db";
+import type { DbTicket, DbUser } from '$lib/types/db';
 
-export type TicketSorter = (a:DbTicket, b:DbTicket) => number;
-export type UserSorter = (a:DbUser, b:DbUser) => number;
+export type Sorter<T> = (a: T, b: T) => number;
 
-export const sortTicketById: TicketSorter = (a, b) => {
-  return a.ticketId - b.ticketId;
-}
+export const sortTicketById: Sorter<DbTicket> = (a, b) => {
+	return a.ticketId - b.ticketId;
+};
 
-export const sortByPriority: TicketSorter = (a, b) => {
-  return b.priority - a.priority;
-}
+export const sortByPriority: Sorter<DbTicket> = (a, b) => {
+	return b.priority - a.priority;
+};
 
-export const sortByRisk: TicketSorter = (a, b) => {
-  return b.risk - a.risk;
-}
+export const sortByRisk: Sorter<DbTicket> = (a, b) => {
+	return b.risk - a.risk;
+};
 
-export const sortUserById: UserSorter = (a, b) => {
-  return a.userId.localeCompare(b.userId);
-}
+export const sortUserById: Sorter<DbUser> = (a, b) => {
+	return a.userId.localeCompare(b.userId);
+};

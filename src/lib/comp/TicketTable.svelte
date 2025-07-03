@@ -25,7 +25,7 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
-	import { sortTicketById, sortByPriority, sortByRisk, type TicketSorter } from './sorting';
+	import { sortTicketById, sortByPriority, sortByRisk, type Sorter } from './sorting';
 
 	let {
 		tickets = $bindable(),
@@ -41,7 +41,7 @@
 		defaultTeams: number[];
 	} = $props();
 
-	let sorter: TicketSorter = $state(sortTicketById);
+	let sorter: Sorter<DbTicket> = $state(sortTicketById);
 	const filter = $state({
 		show: false,
 		search: '',
@@ -54,7 +54,7 @@
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 	const ticketStatusColors = ['', 'text-green-500', 'text-blue-500', 'text-orange-500', 'text-gray-500'];
 
-	function filterTickets(tickets: DbTicket[], filter: any, sorter: TicketSorter) {
+	function filterTickets(tickets: DbTicket[], filter: any, sorter: Sorter<DbTicket>) {
 		let searchLow = filter.search.toLowerCase();
 		return tickets
 			.filter((v) => {

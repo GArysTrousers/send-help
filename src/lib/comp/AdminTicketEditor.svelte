@@ -1,15 +1,6 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import {
-		Avatar,
-		Button,
-		Heading,
-		Spinner,
-		Timeline,
-		TimelineItem,
-		Input,
-		Select,
-	} from 'flowbite-svelte';
+	import { Avatar, Button, Heading, Spinner, Timeline, TimelineItem, Input, Select } from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { stores } from '$lib/stores.svelte';
@@ -58,7 +49,7 @@
 		try {
 			await api('/api/ticket/add_comment', {
 				message: newCommentMessage,
-				ticketId: ticketId
+				ticketId: ticketId,
 			});
 			newCommentMessage = '';
 			getComments();
@@ -73,7 +64,7 @@
 				statusId: ticketDetails.ticket.statusId,
 				priority: ticketDetails.ticket.priority,
 				risk: ticketDetails.ticket.risk,
-				owner: ticketDetails.ticket.owner
+				owner: ticketDetails.ticket.owner,
 			});
 			await refresh();
 		} catch (e) {}
@@ -86,7 +77,7 @@
 				const file = await loadFile(fileSelector.files[0]);
 				await api('/api/ticket/add_file', {
 					...file,
-					ticketId: ticketDetails.ticket.ticketId
+					ticketId: ticketDetails.ticket.ticketId,
 				});
 			} catch (e) {}
 			getComments();
@@ -163,23 +154,25 @@
 									title="Email Owner"
 									class="p-1 text-lg"
 									color="none"
-									href="mailto:{ticketDetails.user.email}?subject=Ticket: {ticketDetails.ticket
-										.subject}"><Fa icon={faEnvelope} /></Button
+									href="mailto:{ticketDetails.user.email}?subject=Ticket: {ticketDetails.ticket.subject}"
 								>
+									<Fa icon={faEnvelope} />
+								</Button>
 								<Button
 									title="Start Teams Chat"
 									class="p-1 text-lg"
 									color="none"
 									on:click={() => {
 										if (ticketDetails) openTeamsChat(ticketDetails.user.email);
-									}}><Fa icon={faCommentDots} /></Button
+									}}
 								>
+									<Fa icon={faCommentDots} />
+								</Button>
 							</div>
 						</div>
 					</div>
 					<div>{ticketDetails.ticket.message}</div>
-					<div class="flex-col mt-5">
-						<Heading tag="h4">History</Heading>
+					<div class="mt-5 flex-col">
 						<Timeline>
 							<TimelineItem>
 								Created: {dayjs(ticketDetails.ticket.created).format('DD MMM YYYY - hh:mm')}
@@ -217,26 +210,15 @@
 							on:change={updateTicket}
 							size="sm"
 						/>
-						<Button class="my-2 gap-1" on:click={sendUpdateNotification}
-							><Fa icon={faEnvelope} />Notify</Button
-						>
+						<Button class="my-2 gap-1" on:click={sendUpdateNotification}><Fa icon={faEnvelope} />Notify</Button>
 					</div>
 				</div>
 			</div>
 
 			<div class="flex-row gap-2">
 				<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
-				<Input
-					bind:value={newCommentMessage}
-					on:keypress={enterPressed}
-					placeholder="Add comment"
-				/>
-				<Button
-					class="w-14 p-0"
-					color="none"
-					disabled={uploading}
-					on:click={() => fileSelector.click()}
-				>
+				<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment" />
+				<Button class="w-14 p-0" color="none" disabled={uploading} on:click={() => fileSelector.click()}>
 					{#if uploading}
 						<Spinner size="5" />
 					{:else}
@@ -249,11 +231,7 @@
 	{/if}
 </div>
 
-<UserPicker
-	title="Change Ticket Owner"
-	onUserClicked={changeOwner}
-	bind:open={changeOwnerUserPickerOpen}
-></UserPicker>
+<UserPicker title="Change Ticket Owner" onUserClicked={changeOwner} bind:open={changeOwnerUserPickerOpen}></UserPicker>
 
 <style>
 	:global(ol > li) {

@@ -31,7 +31,7 @@ export interface DbTicket {
   'owner': string;
   'priority': number;
   'risk': number;
-  'statusId': number | null;
+  'statusId': number;
   'subject': string;
   'teamId': number;
   'ticketId': number;

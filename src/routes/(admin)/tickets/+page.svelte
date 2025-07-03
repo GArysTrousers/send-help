@@ -34,9 +34,9 @@
 		}
 	});
 
-  onDestroy(() => {
-    window.clearInterval(refreshTimer)
-  })
+	onDestroy(() => {
+		clearInterval(refreshTimer);
+	});
 
 	async function getData() {
 		tickets = await api('/api/ticket/get_all');

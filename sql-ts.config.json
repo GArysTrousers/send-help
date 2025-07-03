@@ -5,7 +5,7 @@
   "tableNameCasing": "pascal",
   "globalOptionality": "required",
   "connection": {
-    "filename": "./db.sqlite",
+    "filename": "c:/data/send-help/db.sqlite",
     "options": {
       "readonly": true
     }
