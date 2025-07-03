@@ -6,12 +6,20 @@ export interface Toast {
   body: string;
 }
 
+interface ToastOptions {
+  duration?: number;
+}
+const defaultOptions: ToastOptions = {
+  duration: 5000,
+}
+
 export const toasts: Toast[] = $state([])
 
-export function addToast(type: 'success' | 'error' | 'info', body: string) {
+export function addToast(type: 'success' | 'error' | 'info', body: string, options: ToastOptions = {}) {
+  let o = {...defaultOptions, ...options}
   const id = uuid()
   toasts.push({ id , type, body })
-  setTimeout(() => {removeToast(id)}, 5000)
+  setTimeout(() => {removeToast(id)}, o.duration)
 }
 
 export function removeToast(id: string) {
