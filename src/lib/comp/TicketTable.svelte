@@ -42,21 +42,22 @@
 	} = $props();
 
 	let sorter: Sorter<DbTicket> = $state(sortTicketById);
+	let reverse: boolean = $state(true);
 	const filter = $state({
 		show: false,
 		search: '',
 		teams: defaultTeams,
 		viewCompleted: false,
 	});
-	let searchedTickets: DbTicket[] = $derived(filterTickets(tickets, filter, sorter));
+	let searchedTickets: DbTicket[] = $derived(filterTickets(tickets, filter, sorter, reverse));
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 	const ticketStatusColors = ['', 'text-green-500', 'text-blue-500', 'text-orange-500', 'text-gray-500'];
 
-	function filterTickets(tickets: DbTicket[], filter: any, sorter: Sorter<DbTicket>) {
+	function filterTickets(tickets: DbTicket[], filter: any, sorter: Sorter<DbTicket>, reverse: boolean) {
 		let searchLow = filter.search.toLowerCase();
-		return tickets
+		let t = tickets
 			.filter((v) => {
 				if (searchLow === '') return true;
 				return (
@@ -76,12 +77,24 @@
 			})
 			.slice(0, viewMax)
 			.sort(sorter);
+		if (reverse) {
+			t = t.reverse();
+		}
+		return t;
 	}
 
 	function toggleTeam(teamId: number) {
 		let index = filter.teams.findIndex((v) => v === teamId);
 		if (index === -1) filter.teams.push(teamId);
 		else filter.teams.splice(index, 1);
+	}
+
+	function setSorter(newSorter: Sorter<DbTicket>) {
+		if (sorter === newSorter) reverse = !reverse;
+		else {
+			reverse = false;
+			sorter = newSorter;
+		}
 	}
 </script>
 
@@ -116,9 +129,9 @@
 		<TableHead>
 			<TableHeadCell class="max-w-40">
 				<div class="grid min-w-24 max-w-40 grid-cols-3">
-					<button class="text-left" onclick={() => (sorter = sortTicketById)}>#</button>
-					<button class="text-left" onclick={() => (sorter = sortByPriority)}><Fa icon={faGauge} /></button>
-					<button class="text-left" onclick={() => (sorter = sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
+					<button class="text-left" onclick={() => setSorter(sortTicketById)}>#</button>
+					<button class="text-left" onclick={() => setSorter(sortByPriority)}><Fa icon={faGauge} /></button>
+					<button class="text-left" onclick={() => setSorter(sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
 				</div>
 			</TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
