@@ -78,7 +78,7 @@
 			.slice(0, viewMax)
 			.sort(sorter);
 		if (reverse) {
-			t = t.reverse();
+			t.reverse();
 		}
 		return t;
 	}
