@@ -5,6 +5,7 @@
 	import type { PageData } from './$types';
 	import Fa from 'svelte-fa';
 	import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+	import { addToast } from '$lib/toast.svelte';
 
 	export let data: PageData;
 
@@ -14,7 +15,9 @@
 		try {
 			let res = await api('/api/auth/login', { username, password });
 			if (res) goto('/');
-		} catch (e) {}
+		} catch (e) {
+      addToast('error', e);
+		}
 	}
 
 	function submitIfEnter(event: KeyboardEvent) {
@@ -31,12 +34,7 @@
 			<Heading class="mb-10 text-center">{data.loginTitle || 'Help Desk'}</Heading>
 			<div class="flex flex-col gap-2 px-5 pt-3">
 				<div class="min-w-2xs flex flex-col gap-3">
-					<Input
-						class="rounded-full px-5"
-						bind:value={username}
-						onkeypress={submitIfEnter}
-						placeholder="Username"
-					/>
+					<Input class="rounded-full px-5" bind:value={username} onkeypress={submitIfEnter} placeholder="Username" />
 					<div class="flex flex-row">
 						<Input
 							class="rounded-l-full px-5"
@@ -45,9 +43,7 @@
 							placeholder="Password"
 							type="password"
 						/>
-						<Button class="rounded-r-full pl-2 pr-3 text-xl" onclick={login}
-							><Fa icon={faArrowRight} /></Button
-						>
+						<Button class="rounded-r-full pl-2 pr-3 text-xl" onclick={login}><Fa icon={faArrowRight} /></Button>
 					</div>
 				</div>
 			</div>
