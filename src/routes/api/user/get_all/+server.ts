@@ -7,7 +7,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	permission(locals.session, ['admin']);
 
 	let res = sql.get(`
-  SELECT * FROM user ORDER BY userId`);
+  SELECT userId, fn, ln, email, permissions, src FROM user ORDER BY userId`);
 
 	return json(res);
 };

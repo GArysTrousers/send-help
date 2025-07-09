@@ -2,7 +2,7 @@
 	import { api } from '$lib/api';
 	import { onDestroy, onMount } from 'svelte';
 	import { Heading, Modal } from 'flowbite-svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
 	import type { DbTicket } from '$lib/types/db';
@@ -28,7 +28,9 @@
 	onMount(async () => {
 		await getData();
 		refreshTimer = window.setInterval(() => getData(), 30000);
-		const onLoadViewTicket = Number($page.url.searchParams.get(''));
+    console.log(page.url);
+		const onLoadViewTicket = Number(page.url.searchParams.get(''));
+    console.log("fuck",onLoadViewTicket, !!onLoadViewTicket);
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
 		}
@@ -43,10 +45,11 @@
 	}
 
 	async function viewTicketDetails(id: number) {
+    if (tickets.findIndex((v) => v.ticketId === id) === -1) return
 		editor.data.ticketId = id;
 		editor.open = true;
-		$page.url.searchParams.set('', String(editor.data.ticketId));
-		goto($page.url);
+		page.url.searchParams.set('', String(editor.data.ticketId));
+		goto(page.url);
 	}
 </script>
 
@@ -79,9 +82,9 @@
 <Modal
 	bind:open={editor.open}
 	outsideclose={true}
-	on:close={() => {
-		$page.url.searchParams.delete('');
-		goto($page.url);
+	onclose={() => {
+		page.url.searchParams.delete('');
+		goto(page.url);
 	}}
 >
 	<AdminTicketEditor
