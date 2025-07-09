@@ -75,12 +75,11 @@
 				if (stores.user && stores.user.userId === v.owner) return true;
 				return filter.teams.includes(v.teamId);
 			})
-			.slice(0, viewMax)
 			.sort(sorter);
 		if (reverse) {
 			t.reverse();
 		}
-		return t;
+		return t.slice(0, viewMax);
 	}
 
 	function toggleTeam(teamId: number) {
