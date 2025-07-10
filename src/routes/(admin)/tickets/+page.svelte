@@ -82,7 +82,8 @@
 <Modal
 	bind:open={editor.open}
 	outsideclose={true}
-	onclose={() => {
+  onclose={() => {
+    console.log('she closin');
 		page.url.searchParams.delete('');
 		goto(page.url);
 	}}

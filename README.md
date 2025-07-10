@@ -1,16 +1,20 @@
 # TODO
 
+## Fixes
+- fix my ticket url open
+- fix on close of ticket remove url
+
+## Features
 - ticket: due date?
-- users page
 - permissions
 
 # .env
 
 ```
 SESSION_LENGTH=10000000000
-LDAP_DOMAIN=a.lan
+LDAP_DOMAIN=my.lan
 LDAP_URL=ldap://10.1.1.1:389
-LDAP_USER=user@a.lan
+LDAP_USER=user@my.lan
 LDAP_PASSWORD="@ssword"
 LDAP_USER_BASES="OU=Staff,DC=a,DC=lan"
 CONTENT_DIR=/home/server/data/content
@@ -22,4 +26,5 @@ SMTP_PASS="email@ssword"
 SMTP_FROM="Help Desk <email@outlook.com>"
 CUSTOM_LOGIN_TITLE="Help Desk"
 CUSTOM_ORG_NAME="Big Business"
+SITE_URL="help.mydomain.com"
 ```
