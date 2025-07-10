@@ -26,6 +26,7 @@
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
 	import { sortTicketById, sortByPriority, sortByRisk, type Sorter } from './sorting';
+	import { ticketStatusTextColors } from './info';
 
 	let {
 		tickets = $bindable(),
@@ -53,7 +54,6 @@
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
-	const ticketStatusColors = ['', 'text-green-500', 'text-blue-500', 'text-orange-500', 'text-gray-500'];
 
 	function filterTickets(tickets: DbTicket[], filter: any, sorter: Sorter<DbTicket>, reverse: boolean) {
 		let searchLow = filter.search.toLowerCase();
@@ -167,7 +167,7 @@
 					<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 					<TableBodyCell>
 						<div class="flex-row items-center gap-1">
-							<Fa icon={faCircle} class={ticketStatusColors[t.statusId]} />
+							<Fa icon={faCircle} class={ticketStatusTextColors[t.statusId]} />
 							{stores.ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name || 'Unknown'}
 						</div>
 					</TableBodyCell>

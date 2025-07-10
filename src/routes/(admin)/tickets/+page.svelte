@@ -28,9 +28,8 @@
 	onMount(async () => {
 		await getData();
 		refreshTimer = window.setInterval(() => getData(), 30000);
-    console.log(page.url);
+		console.log(page.url);
 		const onLoadViewTicket = Number(page.url.searchParams.get(''));
-    console.log("fuck",onLoadViewTicket, !!onLoadViewTicket);
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
 		}
@@ -45,7 +44,7 @@
 	}
 
 	async function viewTicketDetails(id: number) {
-    if (tickets.findIndex((v) => v.ticketId === id) === -1) return
+		if (tickets.findIndex((v) => v.ticketId === id) === -1) return;
 		editor.data.ticketId = id;
 		editor.open = true;
 		page.url.searchParams.set('', String(editor.data.ticketId));
@@ -82,10 +81,10 @@
 <Modal
 	bind:open={editor.open}
 	outsideclose={true}
-  onclose={() => {
-    console.log('she closin');
-		page.url.searchParams.delete('');
-		goto(page.url);
+	onclose={() => {
+		console.log('she closin');
+			page.url.searchParams.delete('');
+			goto(page.url);
 	}}
 >
 	<AdminTicketEditor

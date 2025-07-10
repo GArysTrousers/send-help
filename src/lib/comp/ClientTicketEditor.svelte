@@ -50,6 +50,7 @@
 	}
 
 	async function addComment() {
+    if (newCommentMessage === '') return;
 		try {
 			await api('/api/ticket/add_comment', {
 				message: newCommentMessage,

@@ -1,14 +1,24 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import { Avatar, Button, Heading, Spinner, Timeline, TimelineItem, Input, Select } from 'flowbite-svelte';
+	import {
+		Avatar,
+		Button,
+		Heading,
+		Spinner,
+		Timeline,
+		TimelineItem,
+		Input,
+		Select,
+		ButtonGroup,
+	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { stores } from '$lib/stores.svelte';
-	import { faPaperclip, faPen, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+	import { faPaperclip, faPen, faEnvelope, faCircle } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
-	import { priorities, risks } from './info';
+	import { priorities, risks, ticketStatusTextColors } from './info';
 	import { faCommentDots } from '@fortawesome/free-regular-svg-icons';
 	import UserPicker from './UserPicker.svelte';
 	import TicketComment from './TicketComment.svelte';
@@ -46,6 +56,7 @@
 	}
 
 	async function addComment() {
+    if (newCommentMessage === '') return;
 		try {
 			await api('/api/ticket/add_comment', {
 				message: newCommentMessage,
@@ -120,7 +131,8 @@
 		</div>
 	{:else}
 		<div class="flex-col gap-3">
-			<div class="flex-col">
+			<div class="flex-row gap-2 items-center">
+        <Fa icon={faCircle} class={ticketStatusTextColors[ticketDetails.ticket.statusId]} />
 				<Heading tag="h4">{ticketDetails.ticket.subject}</Heading>
 			</div>
 			<div class="flex-col gap-2 md:flex-row">
@@ -182,50 +194,60 @@
 							{/each}
 						</Timeline>
 					</div>
+					<div class="mt-auto flex-row gap-2">
+						<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
+
+						<ButtonGroup class="w-full">
+							<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment"/>
+							<Button on:click={addComment} color="primary">Send</Button>
+						</ButtonGroup>
+						<Button class="w-14 p-0" color="none" disabled={uploading} on:click={() => fileSelector.click()}>
+							{#if uploading}
+								<Spinner size="5" />
+							{:else}
+								<Fa icon={faPaperclip} size="lg" />
+							{/if}
+						</Button>
+					</div>
 				</div>
 
 				<div class="flex-col gap-2">
-					<div class="flex-col">
-						<div class="text-sm">Status</div>
-						<Select
-							class="w-40"
-							items={stores.ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
-							bind:value={ticketDetails.ticket.statusId}
-							on:change={updateTicket}
-							size="sm"
-						/>
-						<div class="text-sm">Priority</div>
-						<Select
-							class="w-40"
-							items={priorities}
-							bind:value={ticketDetails.ticket.priority}
-							on:change={updateTicket}
-							size="sm"
-						/>
-						<div class="text-sm">Risk</div>
-						<Select
-							class="w-40"
-							items={risks}
-							bind:value={ticketDetails.ticket.risk}
-							on:change={updateTicket}
-							size="sm"
-						/>
-						<Button class="my-2 gap-1" on:click={sendUpdateNotification}><Fa icon={faEnvelope} />Notify</Button>
+					<div class="grid grid-cols-2 sm:grid-cols-3 gap-x-2 md:flex md:flex-col md:gap-0">
+						<div class="flex-col">
+							<div class="text-sm">Status</div>
+							<Select
+								class="md:w-32"
+								items={stores.ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
+								bind:value={ticketDetails.ticket.statusId}
+								on:change={updateTicket}
+								size="sm"
+							/>
+						</div>
+
+						<div class="flex-col">
+							<div class="text-sm">Priority</div>
+							<Select
+								class="md:w-32"
+								items={priorities}
+								bind:value={ticketDetails.ticket.priority}
+								on:change={updateTicket}
+								size="sm"
+							/>
+						</div>
+
+						<div class="flex-col">
+							<div class="text-sm">Risk</div>
+							<Select
+								class="md:w-32"
+								items={risks}
+								bind:value={ticketDetails.ticket.risk}
+								on:change={updateTicket}
+								size="sm"
+							/>
+						</div>
+            <Button class="my-2 gap-1 md:w-32 w-full" on:click={sendUpdateNotification}><Fa icon={faEnvelope} />Notify</Button>
 					</div>
 				</div>
-			</div>
-
-			<div class="flex-row gap-2">
-				<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
-				<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment" />
-				<Button class="w-14 p-0" color="none" disabled={uploading} on:click={() => fileSelector.click()}>
-					{#if uploading}
-						<Spinner size="5" />
-					{:else}
-						<Fa icon={faPaperclip} size="lg" />
-					{/if}
-				</Button>
-				<Button on:click={addComment}>Send</Button>
 			</div>
 		</div>
 	{/if}
