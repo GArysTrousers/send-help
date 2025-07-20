@@ -9,6 +9,9 @@
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
 	import TicketComment from './TicketComment.svelte';
+	import { onDestroy } from 'svelte';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -27,6 +30,11 @@
 			getComments();
 		}
 	}
+  
+  onDestroy(() => {
+    page.url.searchParams.delete('');
+		goto(page.url);
+  })
 
 	async function getTicket() {
 		try {
