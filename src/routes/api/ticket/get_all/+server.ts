@@ -14,8 +14,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	permission(locals.session, ['admin']);
 	let body = schema.body.parse(await request.json());
 
-	//TODO: viewCompleted
-
 	if (body.viewCompleted) {
 		return json(sql.get(`SELECT * FROM ticket`));
 	} else {

@@ -29,9 +29,13 @@
 		teams: [],
 		viewCompleted: false,
 	});
+  $effect(() => {
+    filter.viewCompleted
+    getData()
+  })
 
 	onMount(async () => {
-		await getData();
+		// await getData();
 		const onLoadViewTicket = Number($page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
@@ -39,7 +43,7 @@
 	});
 
 	async function getData() {
-		tickets = await api('/api/ticket/get_my');
+		tickets = await api('/api/ticket/get_my', { viewCompleted: filter.viewCompleted });
 	}
 
 	async function viewTicketDetails(id: number) {
