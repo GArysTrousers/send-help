@@ -2,7 +2,7 @@ import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { sql } from '$lib/db';
 import { permission } from '$lib/auth.js';
-import { notifyTicketCreated } from '$lib/notify';
+import { notifyTeamTicketCreated } from '$lib/notify';
 
 const schema = {
 	body: z.object({
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				created: Date.now(),
 			},
 		);
-		notifyTicketCreated(Number(res.lastInsertRowid));
+		notifyTeamTicketCreated(Number(res.lastInsertRowid));
 	} catch (e) {
 		console.log(e);
 		error(500, 'Error creating ticket');

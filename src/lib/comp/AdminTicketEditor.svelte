@@ -22,6 +22,9 @@
 	import { faCommentDots } from '@fortawesome/free-regular-svg-icons';
 	import UserPicker from './UserPicker.svelte';
 	import TicketComment from './TicketComment.svelte';
+	import { onDestroy } from 'svelte';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	let fileSelector: HTMLInputElement;
 	let uploading = false;
@@ -42,6 +45,11 @@
 			getComments();
 		}
 	}
+
+  onDestroy(() => {
+    page.url.searchParams.delete('');
+		goto(page.url);
+  })
 
 	async function getTicket() {
 		try {

@@ -2,6 +2,7 @@ import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { z } from "zod";
 import { sql } from "$lib/db";
 import { permission } from '$lib/auth.js';
+import { notifyTeamTicketUpdated } from '$lib/notify';
 
 const schema = {
   body: z.object({
@@ -20,7 +21,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         ...body,
         userId: locals.session.data.user.userId,
         created: Date.now()
-      })
+      }) 
+      if (locals.session.data.user.type === 'client')
+      notifyTeamTicketUpdated(body.ticketId);
   } catch (e) {
     console.log(e)
   }

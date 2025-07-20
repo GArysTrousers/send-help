@@ -1,5 +1,12 @@
 import type { DbTicket, DbUser } from '$lib/types/db';
 
+export interface TicketFilter {
+	show: boolean;
+	search: string;
+	teams: number[];
+	viewCompleted: boolean;
+}
+
 export type Sorter<T> = (a: T, b: T) => number;
 
 export const sortTicketById: Sorter<DbTicket> = (a, b) => {

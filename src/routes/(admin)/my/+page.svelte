@@ -8,19 +8,27 @@
 	import ClientTicketEditor from '$lib/comp/ClientTicketEditor.svelte';
 	import type { DbTicket } from '$lib/types/db';
 	import TicketTable from '$lib/comp/TicketTable.svelte';
+	import type { TicketFilter } from '$lib/comp/sorting';
 
-	let tickets: DbTicket[] = [];
-	let editor = {
+	let tickets: DbTicket[] = $state([]);
+	let editor = $state({
 		open: false,
 		data: {
-			ticketId: 0
-		}
-	};
-	let creator = {
+			ticketId: 0,
+		},
+	});
+	let creator = $state({
 		open: false,
-		data: {}
-	};
-	let viewMax = 15;
+		data: {},
+	});
+	let viewMax = $state(15);
+
+	let filter: TicketFilter = $state({
+		search: '',
+		show: false,
+		teams: [],
+		viewCompleted: false,
+	});
 
 	onMount(async () => {
 		await getData();
@@ -42,8 +50,8 @@
 	}
 </script>
 
-<div class="flex-col gap-3 w-full max-w-5xl">
-  <div class="flex-row items-center justify-between rounded-xl bg-gray-800 p-2">
+<div class="w-full max-w-5xl flex-col gap-3">
+	<div class="flex-row items-center justify-between rounded-xl bg-gray-800 p-2">
 		<div class="flex-row">
 			<Heading tag="h3" class="px-2">My Tickets</Heading>
 		</div>
@@ -53,7 +61,17 @@
 		onNewClicked={() => (creator.open = true)}
 		onTicketClicked={viewTicketDetails}
 		bind:viewMax
-    defaultTeams={[]}
+		bind:filter
+		showColumns={{
+			ticketId: true,
+			priority: false,
+			risk: true,
+			team: true,
+			type: true,
+			owner: false,
+			subject: true,
+			status: true,
+		}}
 	/>
 </div>
 
@@ -69,12 +87,10 @@
 <Modal
 	bind:open={editor.open}
 	outsideclose={true}
-	on:close={() => {
+	onclose={() => {
 		$page.url.searchParams.delete('');
 		goto($page.url);
 	}}
 >
-	<ClientTicketEditor
-		bind:ticketId={editor.data.ticketId}
-	/>
+	<ClientTicketEditor bind:ticketId={editor.data.ticketId} />
 </Modal>

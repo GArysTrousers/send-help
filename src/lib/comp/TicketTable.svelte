@@ -25,31 +25,39 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
-	import { sortTicketById, sortByPriority, sortByRisk, type Sorter } from './sorting';
+	import { sortTicketById, sortByPriority, sortByRisk, type Sorter, type TicketFilter } from './sorting';
 	import { ticketStatusTextColors } from './info';
+
+	interface Column {
+		ticketId: boolean;
+		priority: boolean;
+		risk: boolean;
+		team: boolean;
+		type: boolean;
+		owner: boolean;
+		subject: boolean;
+		status: boolean;
+	}
 
 	let {
 		tickets = $bindable(),
 		viewMax = $bindable(30),
 		onTicketClicked,
 		onNewClicked,
-		defaultTeams,
+    filter = $bindable(),
+		showColumns,
 	}: {
 		tickets: DbTicket[];
 		viewMax: number;
 		onTicketClicked: (id: number) => Promise<void>;
 		onNewClicked: () => void;
-		defaultTeams: number[];
+    filter: TicketFilter;
+		showColumns: Column;
 	} = $props();
 
 	let sorter: Sorter<DbTicket> = $state(sortTicketById);
 	let reverse: boolean = $state(true);
-	const filter = $state({
-		show: false,
-		search: '',
-		teams: defaultTeams,
-		viewCompleted: false,
-	});
+
 	let searchedTickets: DbTicket[] = $derived(filterTickets(tickets, filter, sorter, reverse));
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
@@ -65,10 +73,6 @@
 					v.message.toLowerCase().includes(searchLow) ||
 					v.owner.toLowerCase().includes(searchLow)
 				);
-			})
-			.filter((v) => {
-				if (filter.viewCompleted) return true;
-				return v.statusId !== 4;
 			})
 			.filter((v) => {
 				if (filter.teams.length === 0) return true;
@@ -126,28 +130,40 @@
 
 	<Table shadow hoverable={searchedTickets.length > 0} class="w-full">
 		<TableHead>
-			<TableHeadCell class="max-w-40">
+			<TableHeadCell class="w-40">
 				<div class="grid min-w-24 max-w-40 grid-cols-3">
-					<button class="text-left" onclick={() => setSorter(sortTicketById)}>#</button>
-					<button class="text-left" onclick={() => setSorter(sortByPriority)}><Fa icon={faGauge} /></button>
-					<button class="text-left" onclick={() => setSorter(sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
+					{#if showColumns.ticketId}
+						<button class="text-left" onclick={() => setSorter(sortTicketById)}>#</button>
+					{/if}
+					{#if showColumns.priority}
+						<button class="text-left" onclick={() => setSorter(sortByPriority)}><Fa icon={faGauge} /></button>
+					{/if}
+					{#if showColumns.risk}
+						<button class="text-left" onclick={() => setSorter(sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
+					{/if}
 				</div>
 			</TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Type</TableHeadCell>
-			<TableHeadCell class="hidden lg:table-cell">Owner</TableHeadCell>
+
+			{#if showColumns.owner}
+				<TableHeadCell class="hidden lg:table-cell">Owner</TableHeadCell>
+			{/if}
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 		</TableHead>
 		<TableBody>
 			{#each searchedTickets as t}
 				<TableBodyRow class="cursor-pointer" onclick={() => onTicketClicked(t.ticketId)}>
-					<TableBodyCell class="max-w-40">
+					<TableBodyCell class="max-w-0">
 						<div class="grid min-w-24 max-w-40 grid-cols-3">
 							<div>#{t.ticketId}</div>
-							<div>
-								<Fa icon={priorityIcons[t.priority - 1]} />
-							</div>
+
+							{#if showColumns.priority}
+								<div>
+									<Fa icon={priorityIcons[t.priority - 1]} />
+								</div>
+							{/if}
 							<div>
 								{#if t.risk > 1}
 									<Fa icon={riskIcons[t.risk - 1]} />
@@ -161,9 +177,12 @@
 					<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
 						{stores.ticketTypes.find((v) => v.ticketTypeId === t.typeId)?.name || 'Unknown'}
 					</TableBodyCell>
-					<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
-						{t.owner || 'Unknown'}
-					</TableBodyCell>
+
+					{#if showColumns.owner}
+						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
+							{t.owner}
+						</TableBodyCell>
+					{/if}
 					<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 					<TableBodyCell>
 						<div class="flex-row items-center gap-1">

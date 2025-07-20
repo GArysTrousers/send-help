@@ -1,15 +1,6 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import {
-		Avatar,
-		Button,
-		Heading,
-		Spinner,
-		Timeline,
-		TimelineItem,
-		Input,
-		A
-	} from 'flowbite-svelte';
+	import { Avatar, Button, Heading, Spinner, Timeline, TimelineItem, Input, A, ButtonGroup } from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { stores } from '$lib/stores.svelte';
@@ -50,11 +41,11 @@
 	}
 
 	async function addComment() {
-    if (newCommentMessage === '') return;
+		if (newCommentMessage === '') return;
 		try {
 			await api('/api/ticket/add_comment', {
 				message: newCommentMessage,
-				ticketId: ticketId
+				ticketId: ticketId,
 			});
 			newCommentMessage = '';
 			getComments();
@@ -68,7 +59,7 @@
 				const file = await loadFile(fileSelector.files[0]);
 				await api('/api/ticket/add_file', {
 					...file,
-					ticketId: ticketDetails.ticket.ticketId
+					ticketId: ticketDetails.ticket.ticketId,
 				});
 			} catch (e) {}
 			getComments();
@@ -114,9 +105,9 @@
 
 				<div class="flex-col gap-2">
 					<div class="flex-col">
-						<div class="text-lg font-bold text-white">
-							{stores.ticketStatuses.find((v) => v.ticketStatusId === ticketDetails?.ticket.statusId)
-								?.name || 'Unknown'}
+						<div class="whitespace-nowrap text-lg font-bold text-white">
+							{stores.ticketStatuses.find((v) => v.ticketStatusId === ticketDetails?.ticket.statusId)?.name ||
+								'Unknown'}
 						</div>
 					</div>
 				</div>
@@ -134,24 +125,17 @@
 			</div>
 			<div class="flex-row gap-2">
 				<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
-				<Input
-					bind:value={newCommentMessage}
-					on:keypress={enterPressed}
-					placeholder="Add comment"
-				/>
-				<Button
-					class="w-14 p-0"
-					color="none"
-					disabled={uploading}
-					on:click={() => fileSelector.click()}
-				>
+				<ButtonGroup class="w-full">
+					<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment" />
+					<Button on:click={addComment} color="primary">Send</Button>
+				</ButtonGroup>
+				<Button class="w-14 p-0" color="none" disabled={uploading} on:click={() => fileSelector.click()}>
 					{#if uploading}
 						<Spinner size="5" />
 					{:else}
 						<Fa icon={faPaperclip} size="lg" />
 					{/if}
 				</Button>
-				<Button on:click={addComment}>Send</Button>
 			</div>
 		</div>
 	{/if}
