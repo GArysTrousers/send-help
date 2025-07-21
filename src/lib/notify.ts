@@ -4,17 +4,22 @@ import { sendEmail } from './email';
 import type { DbTicket, DbUser } from './types/db';
 import { SITE_URL } from '$env/static/private';
 import { error } from '@sveltejs/kit';
-import { RpcServer } from 'mega-rpc';
+import type { Unsafe } from 'sveltekit-sse';
 
-// export const notificationServer = new RpcServer(8080, [
-// 	[
-// 		'ping',
-// 		async () => {
-// 			console.log('ping');
-//       return 'pong'
-// 		},
-// 	],
-// ]);
+export const eventEmitters = new Map<string, (eventName: string, data: string) => Unsafe<void, Error>>()
+
+export function sendEvent(eventName:string, data: object) {
+  console.log(eventEmitters.size);
+  console.log(eventName, data);
+  
+  for (const emitter of eventEmitters.values()) {
+    try {
+      emitter(eventName, JSON.stringify({...data, time: Date.now()}))
+    } catch (e) {
+      console.log(e);
+    }
+  }
+}
 
 const email = z.string().email();
 

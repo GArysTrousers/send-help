@@ -11,6 +11,10 @@
 	import Fa from 'svelte-fa';
 	import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 	import type { TicketFilter } from '$lib/comp/sorting.js';
+	import { source, type Source } from 'sveltekit-sse';
+	import { addToast } from '$lib/toast.svelte.js';
+	import type { Unsubscriber } from 'svelte/store';
+	import { stores } from '$lib/stores.svelte.js';
 	// import { RpcClient } from 'mega-rpc';
 
 	let { data } = $props();
@@ -33,36 +37,31 @@
 		teams: data.user.teams,
 		viewCompleted: false,
 	});
-  $effect(() => {
-    filter.viewCompleted
-    getData()
-  })
-	// let notificationClient: RpcClient;
+	$effect(() => {
+		filter.viewCompleted;
+		getData();
+	});
+
+	let eventUnsub: Unsubscriber | undefined;
 
 	onMount(async () => {
 		const onLoadViewTicket = Number(page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
 		}
-		// notificationClient = new RpcClient(new WS('ws://localhost:8080'), [
-		// 	[
-		// 		'update',
-		// 		async (data) => {
-		// 			console.log(data);
-		// 		},
-		// 	],
-		// ]);
-		// await new Promise((resolve) => {
-		// 	notificationClient.ws.onopen = async () => {
-		// 		resolve(true);
-		// 	};
-		// });
-		// console.log(notificationClient.call('ping', {}));
+		eventUnsub = source('/api/events')
+			.select('ticket-update')
+			.subscribe((v) => {
+				try {
+					let data = JSON.parse(v);
+					if (stores.user?.userId === data.updater) return;
+					addToast('info', `Ticket #${data.ticketId} Updated`);
+				} catch (e) {}
+			});
 	});
-
-	// onDestroy(() => {
-	// 	// remove rpc
-	// });
+	onDestroy(() => {
+		if (eventUnsub) eventUnsub();
+	});
 
 	async function getData() {
 		tickets = await api('/api/ticket/get_all', { viewCompleted: filter.viewCompleted });
