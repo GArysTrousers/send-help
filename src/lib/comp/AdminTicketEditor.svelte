@@ -14,7 +14,7 @@
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { stores } from '$lib/stores.svelte';
-	import { faPaperclip, faPen, faEnvelope, faCircle } from '@fortawesome/free-solid-svg-icons';
+	import { faPaperclip, faPen, faEnvelope, faCircle, faCheck, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
@@ -25,31 +25,60 @@
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { addToast } from '$lib/toast.svelte';
 
-	let fileSelector: HTMLInputElement;
-	let uploading = false;
+	let {
+		ticketId = $bindable(),
+		refresh = async () => {},
+	}: {
+		ticketId: number;
+		refresh: () => Promise<void>;
+	} = $props();
 
-	export let ticketId = 0;
-	export let refresh = async () => {};
+	let fileSelector: HTMLInputElement | undefined = $state();
+	let uploading = $state(false);
+	let ticketDetails: TicketDetails | null = $state(null);
+	let comments: CommentWithFile[] = $state([]);
+	let changeOwnerUserPickerOpen = $state(false);
+	let newCommentMessage = $state('');
 
-	let ticketDetails: TicketDetails | null = null;
-	let comments: CommentWithFile[] = [];
-	let changeOwnerUserPickerOpen = false;
+	onDestroy(() => {
+		page.url.searchParams.delete('');
+		goto(page.url);
+	});
 
-	let newCommentMessage = '';
-
-	$: {
-		if (ticketId === 0) {
-		} else {
+	$effect(() => {
+		if (ticketId !== 0) {
 			getTicket();
 			getComments();
 		}
-	}
+	});
 
-  onDestroy(() => {
-    page.url.searchParams.delete('');
-		goto(page.url);
-  })
+	let quickProgress: {[key: number]: any} = {
+		1: {
+			icon: faArrowRight,
+			title: 'Change to In Progress',
+      class: ticketStatusTextColors[2]
+		},
+		2: {
+			icon: faCheck,
+			title: 'Change to Completed',
+      class: ticketStatusTextColors[1]
+		},
+		3: {
+			icon: faCheck,
+			title: 'Change to Completed',
+      class: ticketStatusTextColors[1]
+		},
+	};
+
+	async function progressTicket() {
+		if (ticketDetails === null) return;
+		if (ticketDetails.ticket.statusId === 1) ticketDetails.ticket.statusId = 2;
+		else if (ticketDetails.ticket.statusId === 2) ticketDetails.ticket.statusId = 4;
+		else if (ticketDetails.ticket.statusId === 3) ticketDetails.ticket.statusId = 4;
+		await updateTicket();
+	}
 
 	async function getTicket() {
 		try {
@@ -64,7 +93,7 @@
 	}
 
 	async function addComment() {
-    if (newCommentMessage === '') return;
+		if (newCommentMessage === '') return;
 		try {
 			await api('/api/ticket/add_comment', {
 				message: newCommentMessage,
@@ -90,7 +119,7 @@
 	}
 
 	async function uploadFile() {
-		if (ticketDetails && fileSelector.files && fileSelector.files.length > 0) {
+		if (fileSelector && ticketDetails && fileSelector.files && fileSelector.files.length > 0) {
 			uploading = true;
 			try {
 				const file = await loadFile(fileSelector.files[0]);
@@ -118,7 +147,9 @@
 	async function sendUpdateNotification() {
 		try {
 			await api('/api/notification/client/ticket_update', { ticketId });
-		} catch (e) {}
+		} catch (e) {
+			addToast('error', e);
+		}
 	}
 
 	async function changeOwner(owner: string) {
@@ -139,8 +170,8 @@
 		</div>
 	{:else}
 		<div class="flex-col gap-3">
-			<div class="flex-row gap-2 items-center">
-        <Fa icon={faCircle} class={ticketStatusTextColors[ticketDetails.ticket.statusId]} />
+			<div class="flex-row items-center gap-2">
+				<Fa icon={faCircle} class={ticketStatusTextColors[ticketDetails.ticket.statusId]} />
 				<Heading tag="h4">{ticketDetails.ticket.subject}</Heading>
 			</div>
 			<div class="flex-col gap-2 md:flex-row">
@@ -203,13 +234,20 @@
 						</Timeline>
 					</div>
 					<div class="mt-auto flex-row gap-2">
-						<input class="hidden" type="file" bind:this={fileSelector} on:change={uploadFile} />
+						<input class="hidden" type="file" bind:this={fileSelector} onchange={uploadFile} />
 
 						<ButtonGroup class="w-full">
-							<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment"/>
+							<Input bind:value={newCommentMessage} on:keypress={enterPressed} placeholder="Add comment" />
 							<Button on:click={addComment} color="primary">Send</Button>
 						</ButtonGroup>
-						<Button class="w-14 p-0" color="none" disabled={uploading} on:click={() => fileSelector.click()}>
+						<Button
+							class="w-14 p-0"
+							color="none"
+							disabled={uploading}
+							on:click={() => {
+								if (fileSelector) fileSelector.click();
+							}}
+						>
 							{#if uploading}
 								<Spinner size="5" />
 							{:else}
@@ -220,22 +258,32 @@
 				</div>
 
 				<div class="flex-col gap-2">
-					<div class="grid grid-cols-2 sm:grid-cols-3 gap-x-2 md:flex md:flex-col md:gap-0">
+					<div class="grid grid-cols-2 gap-x-2 sm:grid-cols-3 md:flex md:w-40 md:flex-col md:gap-0">
 						<div class="flex-col">
 							<div class="text-sm">Status</div>
-							<Select
-								class="md:w-32"
-								items={stores.ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
-								bind:value={ticketDetails.ticket.statusId}
-								on:change={updateTicket}
-								size="sm"
-							/>
+							<div class="flex-row gap-1">
+								<Select
+									items={stores.ticketStatuses.map((v) => ({ name: v.name, value: v.ticketStatusId }))}
+									bind:value={ticketDetails.ticket.statusId}
+									on:change={updateTicket}
+									size="sm"
+								/>
+								{#if ticketDetails.ticket.statusId > 0 && ticketDetails.ticket.statusId < 4}
+									<Button
+										class="p-2"
+										color="light"
+										onclick={progressTicket}
+										title={quickProgress[ticketDetails.ticket.statusId].title}
+									>
+										<Fa class={quickProgress[ticketDetails.ticket.statusId].class} icon={quickProgress[ticketDetails.ticket.statusId].icon} />
+									</Button>
+								{/if}
+							</div>
 						</div>
 
 						<div class="flex-col">
 							<div class="text-sm">Priority</div>
 							<Select
-								class="md:w-32"
 								items={priorities}
 								bind:value={ticketDetails.ticket.priority}
 								on:change={updateTicket}
@@ -245,15 +293,11 @@
 
 						<div class="flex-col">
 							<div class="text-sm">Risk</div>
-							<Select
-								class="md:w-32"
-								items={risks}
-								bind:value={ticketDetails.ticket.risk}
-								on:change={updateTicket}
-								size="sm"
-							/>
+							<Select items={risks} bind:value={ticketDetails.ticket.risk} on:change={updateTicket} size="sm" />
 						</div>
-            <Button class="my-2 gap-1 md:w-32 w-full" on:click={sendUpdateNotification}><Fa icon={faEnvelope} />Notify</Button>
+						<Button class="my-2 w-full gap-1" on:click={sendUpdateNotification}>
+							<Fa icon={faEnvelope} />Notify
+						</Button>
 					</div>
 				</div>
 			</div>

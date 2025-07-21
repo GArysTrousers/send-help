@@ -27,7 +27,6 @@
 		data: {},
 	});
 	let viewMax = $state(15);
-	let refreshTimer: number;
 	let filter: TicketFilter = $state({
 		search: '',
 		show: false,
@@ -41,8 +40,6 @@
 	// let notificationClient: RpcClient;
 
 	onMount(async () => {
-		// await getData();
-		// refreshTimer = window.setInterval(() => getData(), 30000);
 		const onLoadViewTicket = Number(page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
@@ -64,7 +61,7 @@
 	});
 
 	// onDestroy(() => {
-	// 	clearInterval(refreshTimer);
+	// 	// remove rpc
 	// });
 
 	async function getData() {
