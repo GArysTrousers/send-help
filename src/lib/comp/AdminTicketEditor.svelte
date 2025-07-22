@@ -147,6 +147,7 @@
 	async function sendUpdateNotification() {
 		try {
 			await api('/api/notification/client/ticket_update', { ticketId });
+      addToast('success', "Email sent")
 		} catch (e) {
 			addToast('error', e);
 		}
