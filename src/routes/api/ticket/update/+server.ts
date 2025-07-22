@@ -27,7 +27,7 @@ export async function POST({ request, locals }) {
       WHERE ticketId = :ticketId`, body)
       sendEvent('ticket-update', {
         updater: locals.session.data.user.userId,
-        ticketId: body.ticketId
+        ticketId: body.ticketId,
       })
     return json({})
   } catch (e) {

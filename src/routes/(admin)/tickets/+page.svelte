@@ -57,15 +57,20 @@
 				try {
 					let data = JSON.parse(v);
 					if (stores.user?.userId === data.updater) return;
-					addToast('info', `Ticket #${data.ticketId} Updated`, {
-						duration: 60000,
-						onClick: (id) => {
-							viewTicketDetails(data.ticketId);
-							removeToast(id);
-						},
-					});
-					getData();
-					if (notificationAudio) notificationAudio.play();
+					let ticket = tickets.find((v) => v.ticketId === data.ticketId);
+					if (ticket) {
+						if (stores.user && stores.user.teams.includes(ticket.teamId)) {
+							addToast('info', `Ticket #${ticket.ticketId} Updated`, {
+								duration: 60000,
+								onClick: (id) => {
+									viewTicketDetails(ticket.ticketId);
+									removeToast(id);
+								},
+							});
+							getData();
+							if (notificationAudio) notificationAudio.play();
+						}
+					}
 				} catch (e) {}
 			});
 	});

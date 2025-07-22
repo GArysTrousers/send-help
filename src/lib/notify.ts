@@ -69,6 +69,7 @@ export async function notifyTeamTicketUpdated(ticketId: number) {
 	sendEvent('ticket-update', {
 		updater: '',
 		ticketId: ticket.ticketId,
+    teamId: ticket.teamId
 	});
 	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
 

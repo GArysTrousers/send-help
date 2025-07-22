@@ -63,7 +63,7 @@
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 
-	function filterTickets(tickets: DbTicket[], filter: any, sorter: Sorter<DbTicket>, reverse: boolean) {
+	function filterTickets(tickets: DbTicket[], filter: TicketFilter, sorter: Sorter<DbTicket>, reverse: boolean) {
 		let searchLow = filter.search.toLowerCase();
 		let t = tickets
 			.filter((v) => {
