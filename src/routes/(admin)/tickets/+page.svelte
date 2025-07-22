@@ -67,8 +67,8 @@
 									removeToast(id);
 								},
 							});
-							getData();
 							if (notificationAudio) notificationAudio.play();
+              getData();
 						}
 					}
 				} catch (e) {}

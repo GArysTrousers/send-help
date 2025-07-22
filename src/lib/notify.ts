@@ -66,11 +66,6 @@ export async function notifyTeamTicketUpdated(ticketId: number) {
     WHERE u_t.teamId = :teamId`,
 		{ teamId: ticket.teamId },
 	);
-	sendEvent('ticket-update', {
-		updater: '',
-		ticketId: ticket.ticketId,
-    teamId: ticket.teamId
-	});
 	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
 
 	const owner = sql.getOne<DbUser>(`SELECT * FROM user WHERE userId = :owner`, { owner: ticket.owner });
