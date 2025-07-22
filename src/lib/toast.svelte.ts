@@ -4,16 +4,16 @@ export interface Toast {
 	id: string;
 	type: 'success' | 'error' | 'info';
 	body: string;
-	onClick?: () => void;
+	onClick: (id: string) => void;
 }
 
 interface ToastOptions {
 	duration?: number;
-	onClick?: () => void;
+	onClick?: (id: string) => void;
 }
-const defaultOptions: ToastOptions = {
+const defaultOptions = {
 	duration: 5000,
-	onClick: undefined,
+	onClick: removeToast,
 };
 
 export const toasts: Toast[] = $state([]);
@@ -28,13 +28,12 @@ export function addToast(type: 'success' | 'error' | 'info', body: string | unkn
 		message = '?';
 		console.log(body);
 	}
-	if (o.onClick === undefined) {
-		o.onClick = () => removeToast(id);
+	toasts.push({ id, type, body: message, onClick: o.onClick });
+	if (o.duration !== undefined && o.duration > 0) {
+		setTimeout(() => {
+			removeToast(id);
+		}, o.duration);
 	}
-	toasts.push({ id, type, body: message });
-	setTimeout(() => {
-		removeToast(id);
-	}, o.duration);
 }
 
 export function removeToast(id: string) {

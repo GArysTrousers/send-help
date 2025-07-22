@@ -3,7 +3,7 @@
 	import { faCheck, faInfo, faWarning } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
-	let { toast, onClick = removeToast }: { toast: Toast; onClick?: (id: string) => any } = $props();
+	let { toast }: { toast: Toast; } = $props();
 	const styles = {
 		success: {
 			body: 'border-green-600 bg-green-200 text-green-700',
@@ -24,7 +24,7 @@
 	class="flex flex-row items-center gap-2 rounded-xl border px-4 py-3 whitespace-nowrap w-full {styles[
 		toast.type
 	].body}"
-	onclick={(e) => onClick(toast.id)}
+	onclick={() => toast.onClick(toast.id)}
 >
 	<div class="rounded-lg bg-white p-2 w-8 h-8 flex flex-col items-center justify-center"><Fa icon={styles[toast.type].icon} /></div>
 	<div>{toast.body}</div>

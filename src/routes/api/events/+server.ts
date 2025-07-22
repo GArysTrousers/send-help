@@ -8,10 +8,9 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 	try {
       console.log('new connection');
 		return produce(async ({ emit }) => {
-      let id = uuid()
-      eventEmitters.set(id, emit)
+      eventEmitters.add(emit)
 			return () => {
-				eventEmitters.delete(id)
+				eventEmitters.delete(emit)
 			};
 		});
 	} catch (e) {

@@ -11,13 +11,14 @@
 	import Fa from 'svelte-fa';
 	import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 	import type { TicketFilter } from '$lib/comp/sorting.js';
-	import { source, type Source } from 'sveltekit-sse';
-	import { addToast } from '$lib/toast.svelte.js';
+	import { source } from 'sveltekit-sse';
+	import { addToast, removeToast } from '$lib/toast.svelte.js';
 	import type { Unsubscriber } from 'svelte/store';
 	import { stores } from '$lib/stores.svelte.js';
-	// import { RpcClient } from 'mega-rpc';
 
 	let { data } = $props();
+
+	let notificationAudio: HTMLAudioElement | undefined;
 
 	let tickets: DbTicket[] = $state([]);
 	let editor = $state({
@@ -45,6 +46,7 @@
 	let eventUnsub: Unsubscriber | undefined;
 
 	onMount(async () => {
+		notificationAudio = new Audio('/audio/notification01.mp3');
 		const onLoadViewTicket = Number(page.url.searchParams.get(''));
 		if (onLoadViewTicket) {
 			viewTicketDetails(onLoadViewTicket);
@@ -55,7 +57,15 @@
 				try {
 					let data = JSON.parse(v);
 					if (stores.user?.userId === data.updater) return;
-					addToast('info', `Ticket #${data.ticketId} Updated`);
+					addToast('info', `Ticket #${data.ticketId} Updated`, {
+						duration: 60000,
+						onClick: (id) => {
+							viewTicketDetails(data.ticketId);
+							removeToast(id);
+						},
+					});
+					getData();
+					if (notificationAudio) notificationAudio.play();
 				} catch (e) {}
 			});
 	});

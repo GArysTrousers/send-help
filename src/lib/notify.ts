@@ -6,19 +6,19 @@ import { SITE_URL } from '$env/static/private';
 import { error } from '@sveltejs/kit';
 import type { Unsafe } from 'sveltekit-sse';
 
-export const eventEmitters = new Map<string, (eventName: string, data: string) => Unsafe<void, Error>>()
+export const eventEmitters = new Set<(eventName: string, data: string) => Unsafe<void, Error>>();
 
-export function sendEvent(eventName:string, data: object) {
-  console.log(eventEmitters.size);
-  console.log(eventName, data);
-  
-  for (const emitter of eventEmitters.values()) {
-    try {
-      emitter(eventName, JSON.stringify({...data, time: Date.now()}))
-    } catch (e) {
-      console.log(e);
-    }
-  }
+export function sendEvent(eventName: string, data: object) {
+	console.log(eventEmitters.size);
+	console.log(eventName, data);
+
+	for (const emitter of eventEmitters.values()) {
+		try {
+			emitter(eventName, JSON.stringify({ ...data, time: Date.now() }));
+		} catch (e) {
+			console.log(e);
+		}
+	}
 }
 
 const email = z.string().email();
@@ -66,6 +66,10 @@ export async function notifyTeamTicketUpdated(ticketId: number) {
     WHERE u_t.teamId = :teamId`,
 		{ teamId: ticket.teamId },
 	);
+	sendEvent('ticket-update', {
+		updater: '',
+		ticketId: ticket.ticketId,
+	});
 	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
 
 	const owner = sql.getOne<DbUser>(`SELECT * FROM user WHERE userId = :owner`, { owner: ticket.owner });
