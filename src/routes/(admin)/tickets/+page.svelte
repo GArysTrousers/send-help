@@ -90,7 +90,7 @@
 	}
 </script>
 
-<div class="w-full max-w-5xl flex-col gap-3">
+<div class="w-full max-w-7xl flex-col gap-3">
 	<div class="hidden sm:block">
 		<div class="flex-row items-center justify-between rounded-xl bg-gray-800 p-2">
 			<div class="w-full flex-row justify-between">
