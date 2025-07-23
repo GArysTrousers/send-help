@@ -21,7 +21,7 @@
 		</div>
 		<div class="w-full flex-col">
 			{#if comment.fileId === null}
-				<div class="w-full flex-col break-all">
+				<div class="w-full flex-col break-words">
 					{comment.message}
 				</div>
 			{:else if comment.mime === 'image/webp'}

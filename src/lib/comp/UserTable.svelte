@@ -99,6 +99,7 @@
 			<TableHeadCell>First Name</TableHeadCell>
 			<TableHeadCell>Last Name</TableHeadCell>
 			<TableHeadCell>Id</TableHeadCell>
+			<TableHeadCell>Email</TableHeadCell>
 			<TableHeadCell>Source</TableHeadCell>
 		</TableHead>
 		<TableBody>
@@ -107,6 +108,7 @@
 					<TableBodyCell>{u.fn}</TableBodyCell>
 					<TableBodyCell>{u.ln}</TableBodyCell>
 					<TableBodyCell>{u.userId}</TableBodyCell>
+					<TableBodyCell>{u.email}</TableBodyCell>
 					<TableBodyCell>{u.src}</TableBodyCell>
 				</TableBodyRow>
 			{:else}

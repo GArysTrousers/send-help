@@ -22,11 +22,14 @@
 		faMinus,
 		faGauge,
 		faCircle,
+		faCaretLeft,
+		faCaretRight,
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
 	import { sortTicketById, sortByPriority, sortByRisk, type Sorter, type TicketFilter } from './sorting';
 	import { ticketStatusTextColors } from './info';
+	import { page } from '$app/state';
 
 	interface Column {
 		ticketId: boolean;
@@ -44,21 +47,23 @@
 		viewMax = $bindable(30),
 		onTicketClicked,
 		onNewClicked,
-    filter = $bindable(),
+		filter = $bindable(),
 		showColumns,
 	}: {
 		tickets: DbTicket[];
 		viewMax: number;
 		onTicketClicked: (id: number) => Promise<void>;
 		onNewClicked: () => void;
-    filter: TicketFilter;
+		filter: TicketFilter;
 		showColumns: Column;
 	} = $props();
 
 	let sorter: Sorter<DbTicket> = $state(sortTicketById);
 	let reverse: boolean = $state(true);
+	let ticketPage: number = $state(0);
 
 	let searchedTickets: DbTicket[] = $derived(filterTickets(tickets, filter, sorter, reverse));
+	let pagedTickets = $derived(getPage(searchedTickets, ticketPage, viewMax));
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
@@ -83,7 +88,7 @@
 		if (reverse) {
 			t.reverse();
 		}
-		return t.slice(0, viewMax);
+		return t;
 	}
 
 	function toggleTeam(teamId: number) {
@@ -98,6 +103,15 @@
 			reverse = false;
 			sorter = newSorter;
 		}
+	}
+
+	function getPage(array: any[], curPage: number, pageSize: number) {
+		return array.slice(curPage * pageSize, curPage * pageSize + pageSize);
+	}
+
+	function changePage(amount: number) {
+		if (ticketPage + amount < 0) ticketPage = 0;
+		else if (ticketPage + amount < searchedTickets.length / viewMax) ticketPage += amount;
 	}
 </script>
 
@@ -150,10 +164,19 @@
 				<TableHeadCell class="hidden lg:table-cell">Owner</TableHeadCell>
 			{/if}
 			<TableHeadCell>Subject</TableHeadCell>
-			<TableHeadCell>Status</TableHeadCell>
+			<TableHeadCell>
+				<div class="flex-row justify-between">
+					<div>Status</div>
+					<div class="flex-row rounded-lg border border-gray-500 px-1">
+						<button class="text-lg" onclick={() => changePage(-1)}><Fa icon={faCaretLeft} /></button>
+						<div class="w-6 text-center">{ticketPage + 1}</div>
+						<button class="text-lg" onclick={() => changePage(1)}><Fa icon={faCaretRight} /></button>
+					</div>
+				</div>
+			</TableHeadCell>
 		</TableHead>
 		<TableBody>
-			{#each searchedTickets as t}
+			{#each pagedTickets as t}
 				<TableBodyRow class="cursor-pointer" onclick={() => onTicketClicked(t.ticketId)}>
 					<TableBodyCell class="max-w-0">
 						<div class="grid min-w-24 max-w-40 grid-cols-3">

@@ -9,7 +9,7 @@ import type { Unsafe } from 'sveltekit-sse';
 export const eventEmitters = new Set<(eventName: string, data: string) => Unsafe<void, Error>>();
 
 export function sendEvent(eventName: string, data: object) {
-	console.log(`clients:${eventEmitters.size} | event:${eventName} | data:${data}`);
+	console.log(`clients:${eventEmitters.size} | event:${eventName} | data:${JSON.stringify(data)}`);
 
 	for (const emitter of eventEmitters.values()) {
 		try {
