@@ -10,11 +10,21 @@
 		Input,
 		Select,
 		ButtonGroup,
+		MultiSelect,
+		Modal,
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
 	import { stores } from '$lib/stores.svelte';
-	import { faPaperclip, faPen, faEnvelope, faCircle, faCheck, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faPaperclip,
+		faPen,
+		faEnvelope,
+		faCircle,
+		faCheck,
+		faArrowRight,
+		faUserPlus,
+	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
 	import type { CommentWithFile } from '../../routes/api/ticket/get_comments/+server';
@@ -26,6 +36,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { addToast } from '$lib/toast.svelte';
+	import AssignTicketModal from './AssignTicketModal.svelte';
 
 	let {
 		ticketId = $bindable(),
@@ -54,21 +65,21 @@
 		}
 	});
 
-	let quickProgress: {[key: number]: any} = {
+	let quickProgress: { [key: number]: any } = {
 		1: {
 			icon: faArrowRight,
 			title: 'Change to In Progress',
-      class: ticketStatusTextColors[2]
+			class: ticketStatusTextColors[2],
 		},
 		2: {
 			icon: faCheck,
 			title: 'Change to Completed',
-      class: ticketStatusTextColors[1]
+			class: ticketStatusTextColors[1],
 		},
 		3: {
 			icon: faCheck,
 			title: 'Change to Completed',
-      class: ticketStatusTextColors[1]
+			class: ticketStatusTextColors[1],
 		},
 	};
 
@@ -147,7 +158,7 @@
 	async function sendUpdateNotification() {
 		try {
 			await api('/api/notification/client/ticket_update', { ticketId });
-      addToast('success', "Email sent")
+			addToast('success', 'Email sent');
 		} catch (e) {
 			addToast('error', e);
 		}
@@ -162,6 +173,10 @@
 			await refresh();
 		}
 	}
+
+  function openAssignMenu() {
+    
+  }
 </script>
 
 <div>
@@ -276,7 +291,10 @@
 										onclick={progressTicket}
 										title={quickProgress[ticketDetails.ticket.statusId].title}
 									>
-										<Fa class={quickProgress[ticketDetails.ticket.statusId].class} icon={quickProgress[ticketDetails.ticket.statusId].icon} />
+										<Fa
+											class={quickProgress[ticketDetails.ticket.statusId].class}
+											icon={quickProgress[ticketDetails.ticket.statusId].icon}
+										/>
 									</Button>
 								{/if}
 							</div>
@@ -296,9 +314,14 @@
 							<div class="text-sm">Risk</div>
 							<Select items={risks} bind:value={ticketDetails.ticket.risk} on:change={updateTicket} size="sm" />
 						</div>
-						<Button class="my-2 w-full gap-1" on:click={sendUpdateNotification}>
-							<Fa icon={faEnvelope} />Notify
-						</Button>
+						<div class="flex-col gap-2 mt-2">
+							<Button class="w-full gap-1" on:click={sendUpdateNotification}>
+								<Fa icon={faEnvelope} />Notify
+							</Button>
+							<Button color="alternative" class="w-full gap-1" on:click={openAssignMenu}>
+								<Fa icon={faUserPlus} />Assign
+							</Button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -307,6 +330,8 @@
 </div>
 
 <UserPicker title="Change Ticket Owner" onUserClicked={changeOwner} bind:open={changeOwnerUserPickerOpen}></UserPicker>
+
+<AssignTicketModal></AssignTicketModal>
 
 <style>
 	:global(ol > li) {

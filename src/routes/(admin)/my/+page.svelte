@@ -27,7 +27,7 @@
 		search: '',
 		show: false,
 		teams: [],
-		viewCompleted: false,
+		viewCompleted: true,
 	});
   $effect(() => {
     filter.viewCompleted

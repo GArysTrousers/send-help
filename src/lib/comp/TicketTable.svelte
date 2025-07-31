@@ -167,9 +167,9 @@
 			<TableHeadCell>
 				<div class="flex-row justify-between">
 					<div>Status</div>
-					<div class="flex-row rounded-lg border border-gray-500 px-1">
+					<div class="flex-row rounded-lg border border-gray-500 px-1 gap-1">
 						<button class="text-lg" onclick={() => changePage(-1)}><Fa icon={faCaretLeft} /></button>
-						<div class="w-6 text-center">{ticketPage + 1}</div>
+						<div class="text-center">{ticketPage + 1}/{Math.ceil(searchedTickets.length / viewMax)}</div>
 						<button class="text-lg" onclick={() => changePage(1)}><Fa icon={faCaretRight} /></button>
 					</div>
 				</div>
