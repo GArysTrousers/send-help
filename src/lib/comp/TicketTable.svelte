@@ -29,7 +29,6 @@
 	import { stores } from '$lib/stores.svelte';
 	import { sortTicketById, sortByPriority, sortByRisk, type Sorter, type TicketFilter } from './sorting';
 	import { ticketStatusTextColors } from './info';
-	import { page } from '$app/state';
 
 	interface Column {
 		ticketId: boolean;
@@ -62,7 +61,7 @@
 	let reverse: boolean = $state(true);
 	let ticketPage: number = $state(0);
 
-	let searchedTickets: DbTicket[] = $derived(filterTickets(tickets, filter, sorter, reverse));
+	let searchedTickets = $derived(filterTickets(tickets, filter, sorter, reverse));
 	let pagedTickets = $derived(getPage(searchedTickets, ticketPage, viewMax));
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];

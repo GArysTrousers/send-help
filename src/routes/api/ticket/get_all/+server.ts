@@ -14,14 +14,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	permission(locals.session, ['admin']);
 	let body = schema.body.parse(await request.json());
 
+	let tickets = [];
+	let assigned = sql.get(`SELECT userId FROM user_assigned`);
+
 	if (body.viewCompleted) {
-		return json(sql.get(`SELECT * FROM ticket`));
+		tickets = sql.get(`SELECT * FROM ticket`);
 	} else {
-		return json(
-			sql.get(
-				`SELECT * FROM ticket
+		tickets = sql.get(
+			`SELECT * FROM ticket
         WHERE statusId < 4`,
-			),
 		);
 	}
+	return json(tickets.map((t) => ({ ...t, assigned: assigned.filter((a) => a.ticketId === t.ticketId) })));
 };

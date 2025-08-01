@@ -1,21 +1,27 @@
-import { json } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
-import { sql } from "$lib/db";
-import { permission } from "$lib/auth";
-
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { sql } from '$lib/db';
+import { permission } from '$lib/auth';
+import type { DbTeam, DbUserTeam, DbUser } from '$lib/types/db';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  permission(locals.session, ['admin'])
+	permission(locals.session, ['admin']);
 
-  let teams = await sql.get(`SELECT * FROM team`)
-  let members = await sql.get(`
+	let teams = sql.get<DbTeam>(`SELECT * FROM team`);
+	let members = sql.get<DbUserTeam & DbUser>(`
     SELECT * FROM user_team u_t
-    JOIN user u ON u.userId = u_t.userId`)
+    JOIN user u ON u.userId = u_t.userId`);
 
-    teams = teams.map((team) => ({
-      ...team,
-      members: members.filter((user) => user.teamId === team.teamId)
-    }))
+	let res = teams.map((team) => ({
+		...team,
+		members: members.filter((user) => user.teamId === team.teamId),
+	}));
 
-  return json(teams)
+	return json(res);
 };
+
+export type ResponseType = {
+	members: (DbUserTeam & DbUser)[];
+	name: string;
+	teamId: number;
+}[];

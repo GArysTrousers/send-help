@@ -10,8 +10,6 @@
 		Input,
 		Select,
 		ButtonGroup,
-		MultiSelect,
-		Modal,
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
@@ -40,7 +38,7 @@
 
 	let {
 		ticketId = $bindable(),
-		refresh = async () => {},
+		refresh,
 	}: {
 		ticketId: number;
 		refresh: () => Promise<void>;
@@ -52,6 +50,9 @@
 	let comments: CommentWithFile[] = $state([]);
 	let changeOwnerUserPickerOpen = $state(false);
 	let newCommentMessage = $state('');
+	let assignTicketModal = $state({
+		open: false,
+	});
 
 	onDestroy(() => {
 		page.url.searchParams.delete('');
@@ -60,8 +61,7 @@
 
 	$effect(() => {
 		if (ticketId !== 0) {
-			getTicket();
-			getComments();
+			getTicketDetails();
 		}
 	});
 
@@ -89,6 +89,10 @@
 		else if (ticketDetails.ticket.statusId === 2) ticketDetails.ticket.statusId = 4;
 		else if (ticketDetails.ticket.statusId === 3) ticketDetails.ticket.statusId = 4;
 		await updateTicket();
+	}
+
+	async function getTicketDetails() {
+		await Promise.all([getTicket(), getComments()]);
 	}
 
 	async function getTicket() {
@@ -174,9 +178,7 @@
 		}
 	}
 
-  function openAssignMenu() {
-    
-  }
+	function openAssignMenu() {}
 </script>
 
 <div>
@@ -302,25 +304,31 @@
 
 						<div class="flex-col">
 							<div class="text-sm">Priority</div>
-							<Select
-								items={priorities}
-								bind:value={ticketDetails.ticket.priority}
-								on:change={updateTicket}
-								size="sm"
-							/>
+							<Select items={priorities} bind:value={ticketDetails.ticket.priority} onchange={updateTicket} size="sm" />
 						</div>
 
 						<div class="flex-col">
 							<div class="text-sm">Risk</div>
-							<Select items={risks} bind:value={ticketDetails.ticket.risk} on:change={updateTicket} size="sm" />
+							<Select items={risks} bind:value={ticketDetails.ticket.risk} onchange={updateTicket} size="sm" />
 						</div>
-						<div class="flex-col gap-2 mt-2">
-							<Button class="w-full gap-1" on:click={sendUpdateNotification}>
+						<div class="mt-2 flex-col gap-2">
+							<Button class="w-full gap-1" onclick={sendUpdateNotification}>
 								<Fa icon={faEnvelope} />Notify
 							</Button>
-							<Button color="alternative" class="w-full gap-1" on:click={openAssignMenu}>
-								<Fa icon={faUserPlus} />Assign
-							</Button>
+
+							<div class="flex-col rounded-md border border-gray-600 p-2">
+								<div class="flex-row items-center justify-between font-bold">
+									<div>Assigned</div>
+									<Button color="alternative" class="gap-1 p-2" onclick={() => (assignTicketModal.open = true)}>
+										<Fa icon={faUserPlus} />
+									</Button>
+								</div>
+								{#each ticketDetails.ticket.assigned as assigned}
+									<div>{assigned}</div>
+								{:else}
+									<div>None</div>
+								{/each}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -330,8 +338,10 @@
 </div>
 
 <UserPicker title="Change Ticket Owner" onUserClicked={changeOwner} bind:open={changeOwnerUserPickerOpen}></UserPicker>
-
-<AssignTicketModal></AssignTicketModal>
+{#if ticketDetails}
+	<AssignTicketModal bind:open={assignTicketModal.open} ticket={ticketDetails.ticket} refresh={getTicketDetails}
+	></AssignTicketModal>
+{/if}
 
 <style>
 	:global(ol > li) {
