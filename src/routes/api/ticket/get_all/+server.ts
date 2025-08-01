@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	let body = schema.body.parse(await request.json());
 
 	let tickets = [];
-	let assigned = sql.get(`SELECT userId FROM user_assigned`);
+	let assigned = sql.get(`SELECT * FROM user_assigned`);
 
 	if (body.viewCompleted) {
 		tickets = sql.get(`SELECT * FROM ticket`);
@@ -25,5 +25,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         WHERE statusId < 4`,
 		);
 	}
-	return json(tickets.map((t) => ({ ...t, assigned: assigned.filter((a) => a.ticketId === t.ticketId) })));
+
+	return json(
+		tickets.map((t) => ({ ...t, assigned: assigned.filter((a) => a.ticketId === t.ticketId).map((a) => a.userId) })),
+	);
 };

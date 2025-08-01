@@ -29,6 +29,7 @@
 	import { stores } from '$lib/stores.svelte';
 	import { sortTicketById, sortByPriority, sortByRisk, type Sorter, type TicketFilter } from './sorting';
 	import { ticketStatusTextColors } from './info';
+	import type { Ticket } from '$lib/types/db-ext';
 
 	interface Column {
 		ticketId: boolean;
@@ -49,7 +50,7 @@
 		filter = $bindable(),
 		showColumns,
 	}: {
-		tickets: DbTicket[];
+		tickets: Ticket[];
 		viewMax: number;
 		onTicketClicked: (id: number) => Promise<void>;
 		onNewClicked: () => void;
@@ -62,12 +63,12 @@
 	let ticketPage: number = $state(0);
 
 	let searchedTickets = $derived(filterTickets(tickets, filter, sorter, reverse));
-	let pagedTickets = $derived(getPage(searchedTickets, ticketPage, viewMax));
+	let pagedTickets: Ticket[] = $derived(getPage(searchedTickets, ticketPage, viewMax));
 
 	const riskIcons = [faCheck, faTriangleExclamation, faSkullCrossbones];
 	const priorityIcons = [faArrowDown, faMinus, faArrowUp];
 
-	function filterTickets(tickets: DbTicket[], filter: TicketFilter, sorter: Sorter<DbTicket>, reverse: boolean) {
+	function filterTickets(tickets: Ticket[], filter: TicketFilter, sorter: Sorter<DbTicket>, reverse: boolean) {
 		let searchLow = filter.search.toLowerCase();
 		let t = tickets
 			.filter((v) => {
@@ -163,10 +164,10 @@
 				<TableHeadCell class="hidden lg:table-cell">Owner</TableHeadCell>
 			{/if}
 			<TableHeadCell>Subject</TableHeadCell>
+			<TableHeadCell>Status</TableHeadCell>
 			<TableHeadCell>
-				<div class="flex-row justify-between">
-					<div>Status</div>
-					<div class="flex-row rounded-lg border border-gray-500 px-1 gap-1">
+				<div class="flex-row justify-end">
+					<div class="flex-row gap-1 rounded-lg border border-gray-500 px-1">
 						<button class="text-lg" onclick={() => changePage(-1)}><Fa icon={faCaretLeft} /></button>
 						<div class="text-center">{ticketPage + 1}/{Math.ceil(searchedTickets.length / viewMax)}</div>
 						<button class="text-lg" onclick={() => changePage(1)}><Fa icon={faCaretRight} /></button>
@@ -180,7 +181,6 @@
 					<TableBodyCell class="max-w-0">
 						<div class="grid min-w-24 max-w-40 grid-cols-3">
 							<div>#{t.ticketId}</div>
-
 							{#if showColumns.priority}
 								<div>
 									<Fa icon={priorityIcons[t.priority - 1]} />
@@ -210,6 +210,15 @@
 						<div class="flex-row items-center gap-1">
 							<Fa icon={faCircle} class={ticketStatusTextColors[t.statusId]} />
 							{stores.ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name || 'Unknown'}
+						</div>
+					</TableBodyCell>
+					<TableBodyCell>
+						<div class="flex-row gap-0.5 text-lg">
+							{#each t.assigned as a}
+								<div class="h-6 w-6 flex-row items-center justify-center rounded-full bg-gray-600 border border-gray-500" title="">
+									{a[0].toUpperCase()}
+								</div>
+							{/each}
 						</div>
 					</TableBodyCell>
 				</TableBodyRow>

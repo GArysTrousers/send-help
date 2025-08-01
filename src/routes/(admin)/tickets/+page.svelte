@@ -15,12 +15,13 @@
 	import { addToast, removeToast } from '$lib/toast.svelte.js';
 	import type { Unsubscriber } from 'svelte/store';
 	import { stores } from '$lib/stores.svelte.js';
+	import type { Ticket } from '$lib/types/db-ext.js';
 
 	let { data } = $props();
 
 	let notificationAudio: HTMLAudioElement | undefined;
 
-	let tickets: DbTicket[] = $state([]);
+	let tickets: Ticket[] = $state([]);
 	let editor = $state({
 		open: false,
 		data: {

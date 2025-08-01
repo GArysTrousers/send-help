@@ -339,7 +339,13 @@
 
 <UserPicker title="Change Ticket Owner" onUserClicked={changeOwner} bind:open={changeOwnerUserPickerOpen}></UserPicker>
 {#if ticketDetails}
-	<AssignTicketModal bind:open={assignTicketModal.open} ticket={ticketDetails.ticket} refresh={getTicketDetails}
+	<AssignTicketModal
+		bind:open={assignTicketModal.open}
+		ticket={ticketDetails.ticket}
+		refresh={async () => {
+			getTicket();
+			refresh();
+		}}
 	></AssignTicketModal>
 {/if}
 
