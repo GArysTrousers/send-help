@@ -6,11 +6,11 @@
 	import { goto } from '$app/navigation';
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
 	import ClientTicketEditor from '$lib/comp/ClientTicketEditor.svelte';
-	import type { DbTicket } from '$lib/types/db';
-	import TicketTable from '$lib/comp/TicketTable.svelte';
+	import ClientTicketTable from '$lib/comp/ClientTicketTable.svelte';
 	import type { TicketFilter } from '$lib/comp/sorting';
+	import type { Ticket } from '$lib/types/db-ext';
 
-	let tickets: DbTicket[] = $state([]);
+	let tickets: Ticket[] = $state([]);
 	let editor = $state({
 		open: false,
 		data: {
@@ -60,22 +60,12 @@
 			<Heading tag="h3" class="px-2">My Tickets</Heading>
 		</div>
 	</div>
-	<TicketTable
+	<ClientTicketTable
 		bind:tickets
 		onNewClicked={() => (creator.open = true)}
 		onTicketClicked={viewTicketDetails}
 		bind:viewMax
 		bind:filter
-		showColumns={{
-			ticketId: true,
-			priority: false,
-			risk: true,
-			team: true,
-			type: true,
-			owner: false,
-			subject: true,
-			status: true,
-		}}
 	/>
 </div>
 

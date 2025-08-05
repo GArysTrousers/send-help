@@ -31,16 +31,6 @@
 	import { ticketStatusTextColors } from './info';
 	import type { Ticket } from '$lib/types/db-ext';
 
-	interface Column {
-		ticketId: boolean;
-		priority: boolean;
-		risk: boolean;
-		team: boolean;
-		type: boolean;
-		owner: boolean;
-		subject: boolean;
-		status: boolean;
-	}
 
 	let {
 		tickets = $bindable(),
@@ -48,14 +38,12 @@
 		onTicketClicked,
 		onNewClicked,
 		filter = $bindable(),
-		showColumns,
 	}: {
 		tickets: Ticket[];
 		viewMax: number;
 		onTicketClicked: (id: number) => Promise<void>;
 		onNewClicked: () => void;
 		filter: TicketFilter;
-		showColumns: Column;
 	} = $props();
 
 	let sorter: Sorter<DbTicket> = $state(sortTicketById);
@@ -145,24 +133,13 @@
 	<Table shadow hoverable={searchedTickets.length > 0} class="w-full">
 		<TableHead>
 			<TableHeadCell class="w-40">
-				<div class="grid min-w-24 max-w-40 grid-cols-3">
-					{#if showColumns.ticketId}
-						<button class="text-left" onclick={() => setSorter(sortTicketById)}>#</button>
-					{/if}
-					{#if showColumns.priority}
-						<button class="text-left" onclick={() => setSorter(sortByPriority)}><Fa icon={faGauge} /></button>
-					{/if}
-					{#if showColumns.risk}
-						<button class="text-left" onclick={() => setSorter(sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
-					{/if}
+				<div class="grid min-w-24 max-w-40 grid-cols-2">
+					<button class="text-left" onclick={() => setSorter(sortTicketById)}>#</button>
+					<button class="text-left" onclick={() => setSorter(sortByRisk)}><Fa icon={faSkullCrossbones} /></button>
 				</div>
 			</TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Team</TableHeadCell>
 			<TableHeadCell class="hidden lg:table-cell">Type</TableHeadCell>
-
-			{#if showColumns.owner}
-				<TableHeadCell class="hidden lg:table-cell">Owner</TableHeadCell>
-			{/if}
 			<TableHeadCell>Subject</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
 			<TableHeadCell>
@@ -179,13 +156,11 @@
 			{#each pagedTickets as t}
 				<TableBodyRow class="cursor-pointer" onclick={() => onTicketClicked(t.ticketId)}>
 					<TableBodyCell class="max-w-0">
-						<div class="grid min-w-24 max-w-40 grid-cols-3">
+						<div class="grid min-w-24 max-w-40 grid-cols-2">
 							<div>#{t.ticketId}</div>
-							{#if showColumns.priority}
 								<div>
 									<Fa icon={priorityIcons[t.priority - 1]} />
 								</div>
-							{/if}
 							<div>
 								{#if t.risk > 1}
 									<Fa icon={riskIcons[t.risk - 1]} />
@@ -200,11 +175,6 @@
 						{stores.ticketTypes.find((v) => v.ticketTypeId === t.typeId)?.name || 'Unknown'}
 					</TableBodyCell>
 
-					{#if showColumns.owner}
-						<TableBodyCell class="hidden max-w-0 truncate lg:table-cell">
-							{t.owner}
-						</TableBodyCell>
-					{/if}
 					<TableBodyCell>{t.subject.substring(0, 50)}</TableBodyCell>
 					<TableBodyCell>
 						<div class="flex-row items-center gap-1">
@@ -212,15 +182,7 @@
 							{stores.ticketStatuses.find((v) => v.ticketStatusId === t.statusId)?.name || 'Unknown'}
 						</div>
 					</TableBodyCell>
-					<TableBodyCell>
-						<div class="flex-row gap-0.5 text-lg">
-							{#each t.assigned as a}
-								<div class="h-6 w-6 flex-row items-center justify-center rounded-full bg-gray-600 border border-gray-500" title={a}>
-									{a[0].toUpperCase()}
-								</div>
-							{/each}
-						</div>
-					</TableBodyCell>
+					<TableBodyCell></TableBodyCell>
 				</TableBodyRow>
 			{:else}
 				<TableBodyRow>

@@ -5,8 +5,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import TicketCreator from '$lib/comp/TicketCreator.svelte';
-	import type { DbTicket } from '$lib/types/db';
-	import TicketTable from '$lib/comp/TicketTable.svelte';
+	import TicketTable from '$lib/comp/AdminTicketTable.svelte';
 	import AdminTicketEditor from '$lib/comp/AdminTicketEditor.svelte';
 	import Fa from 'svelte-fa';
 	import { faRefresh } from '@fortawesome/free-solid-svg-icons';
@@ -108,16 +107,6 @@
 		onTicketClicked={viewTicketDetails}
 		bind:viewMax
 		bind:filter
-		showColumns={{
-			ticketId: true,
-			priority: true,
-			risk: true,
-			team: true,
-			type: true,
-			owner: true,
-			subject: true,
-			status: true,
-		}}
 	/>
 </div>
 
