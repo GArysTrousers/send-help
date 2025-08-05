@@ -38,7 +38,8 @@ export async function notifyTeamTicketCreated(ticketId: number) {
 	const teamMembers = sql.get<DbUser>(
 		`SELECT u.* FROM user_team u_t
     INNER JOIN user u ON u.userId = u_t.userId
-    WHERE u_t.teamId = :teamId`,
+    WHERE u_t.teamId = :teamId
+    AND u_t.notifyOnNew = 1`,
 		{ teamId: ticket.teamId },
 	);
 	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
@@ -62,7 +63,8 @@ export async function notifyTeamTicketUpdated(ticketId: number) {
 	const teamMembers = sql.get<DbUser>(
 		`SELECT u.* FROM user_team u_t
     INNER JOIN user u ON u.userId = u_t.userId
-    WHERE u_t.teamId = :teamId`,
+    WHERE u_t.teamId = :teamId
+    AND u_t.notifyOnUpdate = 1`,
 		{ teamId: ticket.teamId },
 	);
 	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
@@ -79,7 +81,30 @@ export async function notifyTeamTicketUpdated(ticketId: number) {
 	}
 }
 
-export async function notifyTicketUpdated(ticketId: number) {
+export async function notifyTeamTicketAssigned(ticketId: number, userIds: string[]) {
+  if (userIds.length < 1) return;
+
+	const ticket = sql.getOne<DbTicket>(`SELECT * FROM ticket WHERE ticketId = :ticketId`, { ticketId });
+	if (ticket === null) error(400, 'No ticket found');
+
+	const teamMembers = sql.get<DbUser>(
+		`SELECT u.* FROM user_team u_t
+    INNER JOIN user u ON u.userId = u_t.userId
+    WHERE u_t.userId IN ('${userIds.join("','")}')
+    AND u_t.notifyOnAssignment = 1`,
+	);
+	const toEmails = teamMembers.map((v) => v.email).filter(isEmail);
+
+	if (toEmails.length > 0) {
+		await sendEmail({
+			to: toEmails.join(','),
+			subject: `Ticket Assigned #${ticket.ticketId}: ${ticket.subject}`,
+			html: `You've been assigned to this ticket.<br><br><a href="${SITE_URL}/tickets?=${ticket.ticketId}">Click here to go to the ticket</a>`,
+		});
+	}
+}
+
+export async function notifyOwnerTicketUpdated(ticketId: number) {
 	let ticket = sql.getOne<DbTicket & DbUser>(
 		`SELECT * FROM ticket t 
     INNER JOIN user u ON u.userId = t.owner
