@@ -55,7 +55,14 @@ export interface DbUser {
   'src': string;
   'userId': string;
 }
+export interface DbUserAssigned {
+  'ticketId': number;
+  'userId': string;
+}
 export interface DbUserTeam {
+  'notifyOnAssignment': number;
+  'notifyOnNew': number;
+  'notifyOnUpdate': number;
   'teamId': number;
   'userId': string;
 }

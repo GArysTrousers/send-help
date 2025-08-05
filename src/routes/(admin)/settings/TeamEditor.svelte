@@ -1,32 +1,46 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import type { DbTeam, DbUser } from '$lib/types/db';
+	import type { TeamMember } from '$lib/types/db-ext';
 	import { faUserPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
-	import { Button, Heading, Card, Modal, Input } from 'flowbite-svelte';
+	import {
+		Button,
+		Heading,
+		Card,
+		Modal,
+		Input,
+		Table,
+		TableHead,
+		TableHeadCell,
+		TableBody,
+		TableBodyRow,
+		TableBodyCell,
+		Toggle,
+	} from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 
 	interface Team extends DbTeam {
-		members: DbUser[];
+		members: TeamMember[];
 	}
 
 	interface UserSearch extends DbUser {
 		search: string;
 	}
 
-	let teams: Team[] = [];
-	let users: UserSearch[] = [];
+	let teams: Team[] = $state([]);
+	let users: UserSearch[] = $state([]);
 
-  let creator = {
+	let creator = $state({
 		open: false,
-    name: ''
-	};
+		name: '',
+	});
 
-	let userPicker = {
+	let userPicker = $state({
 		open: false,
 		teamId: 0,
-		search: ''
-	};
+		search: '',
+	});
 
 	onMount(async () => {
 		getAll();
@@ -37,38 +51,50 @@
 			teams = await api('/api/team/get_all_with_members');
 			users = (await api<DbUser[]>('/api/user/get_all')).map((v) => ({
 				...v,
-				search: `${v.fn.toLowerCase()}\t${v.ln.toLowerCase()}`
+				search: `${v.fn.toLowerCase()}\t${v.ln.toLowerCase()}`,
 			}));
 		} catch (e) {}
 	}
 
-async function createTeam() {
-  try {
-    await api('/api/team/create', {
-      name: creator.name,
-    });
-    getAll();
-    creator.open = false;
-  } catch (e) {}
-}
+	async function createTeam() {
+		try {
+			await api('/api/team/create', {
+				name: creator.name,
+			});
+			getAll();
+			creator.open = false;
+		} catch (e) {}
+	}
 
-async function addUserToTeam(userId: string) {
-  try {
-    if (userPicker.teamId === 0) throw new Error('No team selected');
-    await api('/api/team/add_member', {
-      userId,
-      teamId: userPicker.teamId
-    });
-    getAll();
-    userPicker.open = false;
-  } catch (e) {}
-}
+	async function addUserToTeam(userId: string) {
+		try {
+			if (userPicker.teamId === 0) throw new Error('No team selected');
+			await api('/api/team/add_member', {
+				userId,
+				teamId: userPicker.teamId,
+			});
+			getAll();
+			userPicker.open = false;
+		} catch (e) {}
+	}
 
 	async function removeUserFromTeam(userId: string, teamId: number) {
 		try {
 			await api('/api/team/remove_member', {
 				userId,
-				teamId
+				teamId,
+			});
+			getAll();
+		} catch (e) {}
+	}
+
+	async function toggleNotification(member: TeamMember, type: 'notifyOnNew' | 'notifyOnUpdate' | 'notifyOnAssignment') {
+		try {
+			await api('/api/team/set_member_notification', {
+				userId: member.userId,
+				teamId: member.teamId,
+				type,
+				value: member[type] === 1 ? 0 : 1,
 			});
 			getAll();
 		} catch (e) {}
@@ -77,14 +103,18 @@ async function addUserToTeam(userId: string) {
 
 <Heading tag="h3">Teams</Heading>
 <div class="flex-row justify-between">
-	<Button on:click={() => {
-    creator.name = '';
-    creator.open = true;
-  }}>New</Button>
+	<Button
+		on:click={() => {
+			creator.name = '';
+			creator.open = true;
+		}}
+	>
+		New
+	</Button>
 </div>
 <div class="flex-wrap gap-3">
 	{#each teams as team}
-		<Card class="mb-auto">
+		<Card class="mb-auto" size="lg">
 			<div class="flex-row justify-between">
 				<Heading tag="h4">{team.name}</Heading>
 				<Button
@@ -92,25 +122,43 @@ async function addUserToTeam(userId: string) {
 					on:click={() => {
 						userPicker.open = true;
 						userPicker.teamId = team.teamId;
-            userPicker.search = '';
-					}}><Fa icon={faUserPlus} /></Button
+						userPicker.search = '';
+					}}
 				>
+					<Fa icon={faUserPlus} />
+				</Button>
 			</div>
 			<div class="flex-col pt-1">
-				{#each team.members as member}
-					<div class="team-user flex-row items-center justify-between">
-						<div>{member.fn} {member.ln}</div>
-						<div class="remove-user-button">
-							<Button
-								class="!p-2 text-sm"
-								color="light"
-								on:click={() => removeUserFromTeam(member.userId, team.teamId)}
-							>
-								<Fa icon={faMinus} />
-							</Button>
-						</div>
-					</div>
-				{/each}
+				<Table>
+					<TableHead>
+						<TableHeadCell>Name</TableHeadCell>
+						<TableHeadCell>New</TableHeadCell>
+						<TableHeadCell>Update</TableHeadCell>
+						<TableHeadCell>Assign</TableHeadCell>
+						<TableHeadCell>Remove</TableHeadCell>
+					</TableHead>
+					<TableBody>
+						{#each team.members as member}
+							<TableBodyRow>
+								<TableBodyCell>{member.fn} {member.ln}</TableBodyCell>
+								<TableBodyCell>
+									<Toggle checked={!!member.notifyOnNew} onclick={() => toggleNotification(member, 'notifyOnNew')}></Toggle>
+								</TableBodyCell>
+								<TableBodyCell><Toggle checked={!!member.notifyOnUpdate}></Toggle></TableBodyCell>
+								<TableBodyCell><Toggle checked={!!member.notifyOnAssignment}></Toggle></TableBodyCell>
+								<TableBodyCell>
+									<Button
+										class="!p-2 text-sm"
+										color="light"
+										on:click={() => removeUserFromTeam(member.userId, team.teamId)}
+									>
+										<Fa icon={faMinus} />
+									</Button>
+								</TableBodyCell>
+							</TableBodyRow>
+						{/each}
+					</TableBody>
+				</Table>
 			</div>
 		</Card>
 	{/each}
@@ -118,14 +166,14 @@ async function addUserToTeam(userId: string) {
 
 <Modal bind:open={creator.open} title="Create New Team" size="xs">
 	<div class="flex-col gap-3">
-		<Input bind:value={creator.name} placeholder="Name"/>
-    <Button on:click={createTeam}>Create</Button>
+		<Input bind:value={creator.name} placeholder="Name" />
+		<Button on:click={createTeam}>Create</Button>
 	</div>
 </Modal>
 
 <Modal bind:open={userPicker.open} title="Add User to Team" size="xs">
 	<div class="flex-col gap-3">
-		<Input bind:value={userPicker.search} placeholder="Search..."/>
+		<Input bind:value={userPicker.search} placeholder="Search..." />
 		<div class="h-96 flex-col gap-2 overflow-auto">
 			{#each users.filter((v) => {
 				if (userPicker.search === '') return false;

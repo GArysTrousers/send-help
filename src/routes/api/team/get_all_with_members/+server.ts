@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	let teams = sql.get<DbTeam>(`SELECT * FROM team`);
 	let members = sql.get<DbUserTeam & DbUser>(`
     SELECT * FROM user_team u_t
-    JOIN user u ON u.userId = u_t.userId`);
+    INNER JOIN user u ON u.userId = u_t.userId`);
 
 	let res = teams.map((team) => ({
 		...team,
