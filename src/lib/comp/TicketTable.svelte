@@ -215,7 +215,7 @@
 					<TableBodyCell>
 						<div class="flex-row gap-0.5 text-lg">
 							{#each t.assigned as a}
-								<div class="h-6 w-6 flex-row items-center justify-center rounded-full bg-gray-600 border border-gray-500" title="">
+								<div class="h-6 w-6 flex-row items-center justify-center rounded-full bg-gray-600 border border-gray-500" title={a}>
 									{a[0].toUpperCase()}
 								</div>
 							{/each}

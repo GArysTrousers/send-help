@@ -10,7 +10,7 @@
 		TableBodyRow,
 	} from 'flowbite-svelte';
 	import type { DbUser } from '$lib/types/db';
-	import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
+	import { faPlus, faFilter, faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { stores } from '$lib/stores.svelte';
 	import { sortUserById, type Sorter } from './sorting';
@@ -28,6 +28,8 @@
 	} = $props();
 
 	let sorter: Sorter<DbUser> = sortUserById;
+	let userPage: number = $state(0);
+
 	
 	const filter = $state({
 		show: false,
@@ -37,6 +39,7 @@
 	});
 
 	let searchedUsers = $derived(filterUsers(users, filter, sorter));
+	let pagedUsers: DbUser[] = $derived(getPage(searchedUsers, userPage, viewMax));
 
 	function filterUsers(users: DbUser[], filter: any, sorter: Sorter<DbUser>): DbUser[] {
 		let searchText = filter.search.toLowerCase();
@@ -59,7 +62,16 @@
     if (filter.reverse) {
 			u.reverse();
 		}
-    return u.slice(0, viewMax)
+    return u
+	}
+
+  function getPage(array: any[], curPage: number, pageSize: number) {
+		return array.slice(curPage * pageSize, curPage * pageSize + pageSize);
+	}
+
+	function changePage(amount: number) {
+		if (userPage + amount < 0) userPage = 0;
+		else if (userPage + amount < searchedUsers.length / viewMax) userPage += amount;
 	}
 </script>
 
@@ -101,15 +113,25 @@
 			<TableHeadCell>Id</TableHeadCell>
 			<TableHeadCell>Email</TableHeadCell>
 			<TableHeadCell>Source</TableHeadCell>
+      <TableHeadCell>
+				<div class="flex-row justify-end">
+					<div class="flex-row gap-1 rounded-lg border border-gray-500 px-1">
+						<button class="text-lg" onclick={() => changePage(-1)}><Fa icon={faCaretLeft} /></button>
+						<div class="text-center">{userPage + 1}/{Math.ceil(searchedUsers.length / viewMax)}</div>
+						<button class="text-lg" onclick={() => changePage(1)}><Fa icon={faCaretRight} /></button>
+					</div>
+				</div>
+			</TableHeadCell>
 		</TableHead>
 		<TableBody>
-			{#each searchedUsers as u}
+			{#each pagedUsers as u}
 				<TableBodyRow class="cursor-pointer" on:click={() => onTicketClicked(u.userId)}>
 					<TableBodyCell>{u.fn}</TableBodyCell>
 					<TableBodyCell>{u.ln}</TableBodyCell>
 					<TableBodyCell>{u.userId}</TableBodyCell>
 					<TableBodyCell>{u.email}</TableBodyCell>
 					<TableBodyCell>{u.src}</TableBodyCell>
+					<TableBodyCell></TableBodyCell>
 				</TableBodyRow>
 			{:else}
 				<TableBodyRow>

@@ -142,10 +142,19 @@
 							<TableBodyRow>
 								<TableBodyCell>{member.fn} {member.ln}</TableBodyCell>
 								<TableBodyCell>
-									<Toggle checked={!!member.notifyOnNew} onclick={() => toggleNotification(member, 'notifyOnNew')}></Toggle>
+									<Toggle checked={!!member.notifyOnNew} onclick={() => toggleNotification(member, 'notifyOnNew')}
+									></Toggle>
 								</TableBodyCell>
-								<TableBodyCell><Toggle checked={!!member.notifyOnUpdate}></Toggle></TableBodyCell>
-								<TableBodyCell><Toggle checked={!!member.notifyOnAssignment}></Toggle></TableBodyCell>
+								<TableBodyCell>
+									<Toggle checked={!!member.notifyOnUpdate} onclick={() => toggleNotification(member, 'notifyOnUpdate')}
+									></Toggle>
+								</TableBodyCell>
+								<TableBodyCell>
+									<Toggle
+										checked={!!member.notifyOnAssignment}
+										onclick={() => toggleNotification(member, 'notifyOnAssignment')}
+									></Toggle>
+								</TableBodyCell>
 								<TableBodyCell>
 									<Button
 										class="!p-2 text-sm"
@@ -188,10 +197,4 @@
 </Modal>
 
 <style>
-	.remove-user-button {
-		@apply opacity-0 transition-opacity duration-200;
-	}
-	.team-user:hover .remove-user-button {
-		@apply !opacity-100;
-	}
 </style>
