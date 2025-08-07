@@ -1,10 +1,13 @@
 # TODO
 
 ## Fixes
-- fix my ticket url open
-- fix on close of ticket remove url
+
 
 ## Features
+- Session Delete Old
+- LDAP - Delete non-exist users
+- Only show/fetch recent/old tickets
+- Delete tickets
 - ticket: due date?
 - permissions
 

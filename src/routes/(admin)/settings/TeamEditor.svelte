@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { api } from '$lib/api';
+	import { stores } from '$lib/stores.svelte';
 	import type { DbTeam, DbUser } from '$lib/types/db';
 	import type { TeamMember } from '$lib/types/db-ext';
-	import { faUserPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+	import { faUserPlus, faMinus, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import {
 		Button,
 		Heading,
@@ -16,9 +17,13 @@
 		TableBodyRow,
 		TableBodyCell,
 		Toggle,
+		Dropdown,
+		DropdownItem,
 	} from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
+	import TicketTypeTable from './TicketTypeTable.svelte';
+	import { addToast } from '$lib/toast.svelte';
 
 	interface Team extends DbTeam {
 		members: TeamMember[];
@@ -51,7 +56,7 @@
 			teams = await api('/api/team/get_all_with_members');
 			users = (await api<DbUser[]>('/api/user/get_all')).map((v) => ({
 				...v,
-				search: `${v.fn.toLowerCase()}\t${v.ln.toLowerCase()}`,
+				search: `${v.fn.toLowerCase()}|${v.ln.toLowerCase()}|${v.userId.toLowerCase()}`,
 			}));
 		} catch (e) {}
 	}
@@ -99,12 +104,25 @@
 			getAll();
 		} catch (e) {}
 	}
+
+	async function deleteTeam(teamId: number) {
+		if (confirm('Are you sure?\nThis will delete all tickets associated with the team.')) {
+			try {
+				await api('/api/team/delete', { teamId });
+				addToast('success', 'Team Deleted');
+				getAll();
+			} catch (e) {
+				addToast('error', e);
+			}
+		}
+	}
+
 </script>
 
 <Heading tag="h3">Teams</Heading>
 <div class="flex-row justify-between">
 	<Button
-		on:click={() => {
+		onclick={() => {
 			creator.name = '';
 			creator.open = true;
 		}}
@@ -112,23 +130,33 @@
 		New
 	</Button>
 </div>
-<div class="flex-wrap gap-3">
+<div class="flex-col gap-5">
 	{#each teams as team}
 		<Card class="mb-auto" size="lg">
 			<div class="flex-row justify-between">
 				<Heading tag="h4">{team.name}</Heading>
-				<Button
-					class="!p-3"
-					on:click={() => {
-						userPicker.open = true;
-						userPicker.teamId = team.teamId;
-						userPicker.search = '';
-					}}
-				>
-					<Fa icon={faUserPlus} />
-				</Button>
+				<div class="flex-row gap-1">
+					<Button
+						class="h-10 w-10 p-0"
+						on:click={() => {
+							userPicker.open = true;
+							userPicker.teamId = team.teamId;
+							userPicker.search = '';
+						}}
+					>
+						<Fa icon={faUserPlus} />
+					</Button>
+					<Button class="h-10 w-10 p-0" color="alternative">
+						<Fa icon={faEllipsis} />
+					</Button>
+					<Dropdown class="py-2 shadow-lg" placement="bottom-end">
+						<DropdownItem class="flex-row items-center gap-2" onclick={() => deleteTeam(team.teamId)}>
+							<Fa icon={faTrash} />Delete Team
+						</DropdownItem>
+					</Dropdown>
+				</div>
 			</div>
-			<div class="flex-col pt-1">
+			<div class="flex-col pt-5">
 				<Table>
 					<TableHead>
 						<TableHeadCell>Name</TableHeadCell>
@@ -158,7 +186,7 @@
 								<TableBodyCell>
 									<Button
 										class="!p-2 text-sm"
-										color="light"
+										color="alternative"
 										on:click={() => removeUserFromTeam(member.userId, team.teamId)}
 									>
 										<Fa icon={faMinus} />
@@ -168,6 +196,9 @@
 						{/each}
 					</TableBody>
 				</Table>
+			</div>
+			<div class="flex-col pt-5">
+				<TicketTypeTable {team}></TicketTypeTable>
 			</div>
 		</Card>
 	{/each}
@@ -189,7 +220,7 @@
 				return v.search.includes(userPicker.search);
 			}) as user}
 				<Button color="dark" on:click={() => addUserToTeam(user.userId)}>
-					<span class="w-full text-left">{user.fn} {user.ln}</span>
+					<span class="w-full text-left">{user.fn} {user.ln} ({user.userId})</span>
 				</Button>
 			{/each}
 		</div>

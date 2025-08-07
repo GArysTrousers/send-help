@@ -10,6 +10,8 @@
 		Input,
 		Select,
 		ButtonGroup,
+		Dropdown,
+		DropdownItem,
 	} from 'flowbite-svelte';
 	import dayjs from 'dayjs';
 	import type { TicketDetails } from '../../routes/api/ticket/get_details/+server';
@@ -22,6 +24,12 @@
 		faCheck,
 		faArrowRight,
 		faUserPlus,
+		faEllipsisVertical,
+		faCog,
+		faCogs,
+		faChevronUp,
+		faCaretUp,
+		faCaretLeft,
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
@@ -39,9 +47,11 @@
 	let {
 		ticketId = $bindable(),
 		refresh,
+    onDelete,
 	}: {
 		ticketId: number;
 		refresh: () => Promise<void>;
+    onDelete: () => Promise<void>;
 	} = $props();
 
 	let fileSelector: HTMLInputElement | undefined = $state();
@@ -179,6 +189,15 @@
 	}
 
 	function openAssignMenu() {}
+
+	async function deleteTicket() {
+		try {
+			await api('/api/ticket/delete', { ticketId });
+      await onDelete()
+		} catch (e) {
+      addToast('error', e)
+    }
+	}
 </script>
 
 <div>
@@ -238,6 +257,12 @@
 									<Fa icon={faCommentDots} />
 								</Button>
 							</div>
+						</div>
+						<div class="ml-auto">
+							<Button class="h-8 w-8 p-0 text-lg" color="light"><Fa icon={faEllipsisVertical} /></Button>
+							<Dropdown class="py-2">
+								<DropdownItem onclick={deleteTicket}>Delete Ticket</DropdownItem>
+							</Dropdown>
 						</div>
 					</div>
 					<div>{ticketDetails.ticket.message}</div>
@@ -329,6 +354,12 @@
 									<div>None</div>
 								{/each}
 							</div>
+              <div class="ml-auto">
+							<Button class="h-8 w-8 p-0 text-lg" color="alternative"><Fa icon={faCaretLeft} /></Button>
+							<Dropdown class="py-2" placement="top-end">
+								<DropdownItem onclick={deleteTicket}>Delete Ticket</DropdownItem>
+							</Dropdown>
+						</div>
 						</div>
 					</div>
 				</div>

@@ -133,5 +133,9 @@
 		refresh={async () => {
 			getData();
 		}}
+    onDelete={async()=>{
+      getData();
+      editor.open = false;
+    }}
 	/>
 </Modal>
