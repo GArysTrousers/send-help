@@ -30,6 +30,8 @@
 		faChevronUp,
 		faCaretUp,
 		faCaretLeft,
+		faEllipsis,
+		faTrash,
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { loadFile } from '$lib/browser-files';
@@ -47,11 +49,11 @@
 	let {
 		ticketId = $bindable(),
 		refresh,
-    onDelete,
+		onDelete,
 	}: {
 		ticketId: number;
 		refresh: () => Promise<void>;
-    onDelete: () => Promise<void>;
+		onDelete: () => Promise<void>;
 	} = $props();
 
 	let fileSelector: HTMLInputElement | undefined = $state();
@@ -188,15 +190,14 @@
 		}
 	}
 
-	function openAssignMenu() {}
-
 	async function deleteTicket() {
 		try {
 			await api('/api/ticket/delete', { ticketId });
-      await onDelete()
+			await onDelete();
+      addToast('success', 'Ticket Deleted');
 		} catch (e) {
-      addToast('error', e)
-    }
+			addToast('error', e);
+		}
 	}
 </script>
 
@@ -257,12 +258,6 @@
 									<Fa icon={faCommentDots} />
 								</Button>
 							</div>
-						</div>
-						<div class="ml-auto">
-							<Button class="h-8 w-8 p-0 text-lg" color="light"><Fa icon={faEllipsisVertical} /></Button>
-							<Dropdown class="py-2">
-								<DropdownItem onclick={deleteTicket}>Delete Ticket</DropdownItem>
-							</Dropdown>
 						</div>
 					</div>
 					<div>{ticketDetails.ticket.message}</div>
@@ -354,12 +349,10 @@
 									<div>None</div>
 								{/each}
 							</div>
-              <div class="ml-auto">
-							<Button class="h-8 w-8 p-0 text-lg" color="alternative"><Fa icon={faCaretLeft} /></Button>
-							<Dropdown class="py-2" placement="top-end">
-								<DropdownItem onclick={deleteTicket}>Delete Ticket</DropdownItem>
-							</Dropdown>
-						</div>
+								<Button class="gap-2 py-1" color="alternative"><Fa class="text-lg" icon={faEllipsis} /></Button>
+								<Dropdown class="py-2" placement="top">
+									<DropdownItem class="flex-row gap-2 items-center" onclick={deleteTicket}><Fa icon={faTrash}/> Delete Ticket</DropdownItem>
+								</Dropdown>
 						</div>
 					</div>
 				</div>

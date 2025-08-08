@@ -4,12 +4,17 @@
 	import { onMount } from 'svelte';
 	import type { ResponseType } from '../../routes/api/team/get_all_with_members/+server';
 	import Fa from 'svelte-fa';
-	import { faSave } from '@fortawesome/free-solid-svg-icons';
+	import { faCheck, faSave, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
 	import type { Ticket } from '$lib/types/db-ext';
 	import { addToast } from '$lib/toast.svelte';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { faSquare } from '@fortawesome/free-regular-svg-icons';
 
-	let { open = $bindable(), ticket, refresh }: { open: boolean; ticket: Ticket; refresh: () => Promise<void>; } = $props();
+	let {
+		open = $bindable(),
+		ticket,
+		refresh,
+	}: { open: boolean; ticket: Ticket; refresh: () => Promise<void> } = $props();
 
 	let teamMembers: ResponseType = $state([]);
 	let selectableMember = $derived(teamMembers.find((v) => v.teamId === ticket?.teamId)?.members);
@@ -28,23 +33,25 @@
 		try {
 			await api('/api/ticket/set_assigned', { ticketId: ticket?.ticketId, assigned: [...selected.values()] });
 			open = false;
-      refresh()
+			refresh();
 		} catch (e) {
 			addToast('error', e);
 		}
 	}
 </script>
 
-<Modal title="Assign Member to Ticket" bind:open size="xs">
+<Modal title="Assign Member to Ticket" bind:open size="xs" outsideclose={true}>
 	{#if selectableMember}
 		<div class="flex-wrap gap-2 text-white">
 			{#each selectableMember as user}
 				<button
-					class="rounded px-3 py-1 text-left {selected.has(user.userId) ? 'bg-emerald-600' : 'bg-gray-600'}"
+					class="flex-row items-center gap-1 rounded px-2 py-1 text-left {selected.has(user.userId)
+						? 'bg-emerald-600'
+						: 'bg-gray-600'}"
 					onclick={() => toggleAssigned(user.userId)}
 				>
-					{user.fn}
-					{user.ln}
+					<Fa icon={selected.has(user.userId) ? faCheckSquare : faSquare} />
+					<div>{user.fn} {user.ln}</div>
 				</button>
 			{/each}
 		</div>

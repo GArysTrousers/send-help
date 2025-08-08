@@ -31,7 +31,7 @@
 		open: false,
 		data: {},
 	});
-	let viewMax = $state(15);
+	let viewMax = $state(13);
 	let filter: TicketFilter = $state({
 		search: '',
 		show: false,
